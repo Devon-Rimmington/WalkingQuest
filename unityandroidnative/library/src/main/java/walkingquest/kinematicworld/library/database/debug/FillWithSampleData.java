@@ -2,6 +2,7 @@ package walkingquest.kinematicworld.library.database.debug;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import walkingquest.kinematicworld.library.database.databaseHandlers.DatabaseHandler;
 import walkingquest.kinematicworld.library.database.databaseHandlers.EventHandler;
 import walkingquest.kinematicworld.library.database.databaseHandlers.MiniQuestHandler;
 import walkingquest.kinematicworld.library.database.objects.Event;
@@ -12,7 +13,6 @@ import walkingquest.kinematicworld.library.database.objects.MiniQuest;
  */
 
 public class FillWithSampleData {
-
 
     public static MiniQuest[] miniQuests = {
             new MiniQuest("miniquest1", "miniquest #1", "this is the first miniquest", (short)1, 500, 0, false),
@@ -26,20 +26,18 @@ public class FillWithSampleData {
             new Event("event3", "event #3", "this is the third event", (short)1, "explanation of how to do the event", (short)0)
     };
 
-    public static void SampleData(SQLiteDatabase db){
+    public static void SampleData(SQLiteDatabase db, DatabaseHandler databaseHandler){
 
-        MiniQuestHandler miniQuestHandler = new MiniQuestHandler();
+        databaseHandler = new MiniQuestHandler();
 
-        miniQuestHandler.insertObject(miniQuests[0], db);
-        miniQuestHandler.insertObject(miniQuests[1], db);
-        miniQuestHandler.insertObject(miniQuests[2], db);
+        databaseHandler.insertObject(miniQuests[0], db);
+        databaseHandler.insertObject(miniQuests[1], db);
+        databaseHandler.insertObject(miniQuests[2], db);
 
-        EventHandler eventHandler = new EventHandler();
+        databaseHandler = new EventHandler();
 
-        eventHandler.insertObject(events[0], db);
-        eventHandler.insertObject(events[1], db);
-        eventHandler.insertObject(events[2], db);
+        databaseHandler.insertObject(events[0], db);
+        databaseHandler.insertObject(events[1], db);
+        databaseHandler.insertObject(events[2], db);
     }
-
-
 }

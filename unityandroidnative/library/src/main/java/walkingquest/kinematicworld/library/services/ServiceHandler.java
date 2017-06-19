@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import walkingquest.kinematicworld.library.database.DatabaseAccessor;
 import walkingquest.kinematicworld.library.database.contracts.StepLogContract;
+import walkingquest.kinematicworld.library.database.databaseHandlers.EventHandler;
 
 
 /**
@@ -75,9 +76,8 @@ public class ServiceHandler extends Service {
         switch (msg){
             case "STEP":
                 // record a step in the database
-                SQLiteDatabase db = databaseAccessor.getWritableDatabase();
-                db.insert(StepLogContract.TABLE_NAME, null, StepLogContract.StepCommands.AddEntry());
-                db.close();
+                databaseAccessor.databaseHandler = new EventHandler();
+                databaseAccessor.databaseHandler.insertObject(null, databaseAccessor);
                 steps++;
                 break;
             default:

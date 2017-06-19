@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import walkingquest.kinematicworld.library.database.DatabaseAccessor;
 import walkingquest.kinematicworld.library.database.contracts.EventContract;
 import walkingquest.kinematicworld.library.database.contracts.MiniQuestContract;
 import walkingquest.kinematicworld.library.database.objects.Event;
@@ -17,7 +18,9 @@ import walkingquest.kinematicworld.library.database.objects.Event;
 
 public class EventHandler implements DatabaseHandler {
     @Override
-    public ArrayList<Object> getObjects(String[] projections, String selection, String[] selectionArgs, String sortOrder, SQLiteDatabase db) {
+    public ArrayList<Object> getObjects(String[] projections, String selection, String[] selectionArgs, String sortOrder, DatabaseAccessor dba) {
+
+        SQLiteDatabase db = dba.getReadableDatabase();
 
         Cursor cursor = db.query(
                 EventContract.TABLE_NAME,
@@ -41,6 +44,9 @@ public class EventHandler implements DatabaseHandler {
             ));
         }
 
+        cursor.close();
+        db.close();
+
         // if not objects can be found return null to indicate that no objects could be found or an error has occurred
         if(events.size() <= 0)
             return null;
@@ -49,7 +55,9 @@ public class EventHandler implements DatabaseHandler {
     }
 
     @Override
-    public Object getObject(String[] projections, String selection, String[] selectionArgs, String sortOrder, SQLiteDatabase db) {
+    public Object getObject(String[] projections, String selection, String[] selectionArgs, String sortOrder, DatabaseAccessor dba) {
+
+        SQLiteDatabase db = dba.getReadableDatabase();
 
         Cursor cursor = db.query(
                 EventContract.TABLE_NAME,
@@ -74,11 +82,16 @@ public class EventHandler implements DatabaseHandler {
             );
         }
 
+        cursor.close();
+        db.close();
+
         return event;
     }
 
     @Override
-    public boolean insertObject(Object object, SQLiteDatabase db) {
+    public boolean insertObject(Object object, DatabaseAccessor dba) {
+
+        SQLiteDatabase db = dba.getWritableDatabase();
 
         Event event = (Event) object;
 
@@ -92,15 +105,18 @@ public class EventHandler implements DatabaseHandler {
 
         long id = db.insert(EventContract.TABLE_NAME, null, values);
 
+        db.close();
+
         // return if an error has occurred or not
         return id != -1;
     }
 
     @Override
-    public boolean updateObject(Object object, SQLiteDatabase db) {
+    public boolean updateObject(Object object, DatabaseAccessor dba) {
+
+        SQLiteDatabase db = dba.getWritableDatabase();
 
         Event event = (Event) object;
-
 
         String selection = EventContract.COLUMN_EVENT_NAME  + " = ?";
         String[] selectionArgs = { event.getName() };
@@ -116,20 +132,25 @@ public class EventHandler implements DatabaseHandler {
 
         int count = db.update(EventContract.TABLE_NAME, values, selection, selectionArgs);
 
+        db.close();
+
         // return is the row has been updated
         return count != 0;
     }
 
     @Override
-    public boolean deleteObject(Object object, SQLiteDatabase db) {
+    public boolean deleteObject(Object object, DatabaseAccessor dba) {
+
+        SQLiteDatabase db = dba.getWritableDatabase();
 
         Event event = (Event) object;
-
 
         String selection = EventContract.COLUMN_EVENT_NAME  + " = ?";
         String[] selectionArgs = { event.getName() };
 
         int success = db.delete(EventContract.TABLE_NAME, selection, selectionArgs);
+
+        db.close();
 
         // return if the delete was successful or not
         return success != 0;

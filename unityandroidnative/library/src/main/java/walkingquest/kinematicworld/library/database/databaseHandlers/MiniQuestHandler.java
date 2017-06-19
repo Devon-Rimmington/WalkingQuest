@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import walkingquest.kinematicworld.library.database.DatabaseAccessor;
 import walkingquest.kinematicworld.library.database.contracts.MiniQuestContract;
 import walkingquest.kinematicworld.library.database.objects.MiniQuest;
 
@@ -19,7 +20,9 @@ public class MiniQuestHandler implements DatabaseHandler {
 
     // remember to cast the resulting objects as a miniquest
     @Override
-    public ArrayList<Object> getObjects(String[] projections, String selection, String[] selectionArgs, String sortOrder, SQLiteDatabase db) {
+    public ArrayList<Object> getObjects(String[] projections, String selection, String[] selectionArgs, String sortOrder, DatabaseAccessor dba) {
+
+        SQLiteDatabase db = dba.getReadableDatabase();
 
         // execute the query
         Cursor cursor = db.query(
@@ -57,7 +60,9 @@ public class MiniQuestHandler implements DatabaseHandler {
     }
 
     @Override
-    public Object getObject(String[] projections, String selection, String[] selectionArgs, String sortOrder, SQLiteDatabase db) {
+    public Object getObject(String[] projections, String selection, String[] selectionArgs, String sortOrder, DatabaseAccessor dba) {
+
+        SQLiteDatabase db = dba.getReadableDatabase();
 
         // execute the query
         Cursor cursor = db.query(
@@ -87,12 +92,15 @@ public class MiniQuestHandler implements DatabaseHandler {
         }
 
         cursor.close();
+        db.close();
 
         return miniQuests;
     }
 
     @Override
-    public boolean insertObject(Object object, SQLiteDatabase db) {
+    public boolean insertObject(Object object, DatabaseAccessor dba) {
+
+        SQLiteDatabase db = dba.getWritableDatabase();
 
         MiniQuest miniQuest = (MiniQuest) object;
 
@@ -107,12 +115,16 @@ public class MiniQuestHandler implements DatabaseHandler {
 
         long id = db.insert(MiniQuestContract.TABLE_NAME, null, values);
 
+        db.close();
+
         // returns if the insert was a success
         return id != -1;
     }
 
     @Override
-    public boolean updateObject(Object object, SQLiteDatabase db) {
+    public boolean updateObject(Object object, DatabaseAccessor dba) {
+
+        SQLiteDatabase db = dba.getWritableDatabase();
 
         MiniQuest miniQuest = (MiniQuest) object;
 
@@ -130,17 +142,23 @@ public class MiniQuestHandler implements DatabaseHandler {
 
         int count = db.update(MiniQuestContract.TABLE_NAME, values, selection, selectionArgs);
 
+        db.close();
+
         // returns if any rows have been updated
         return count != 0;
     }
 
     @Override
-    public boolean deleteObject(Object object, SQLiteDatabase db) {
+    public boolean deleteObject(Object object, DatabaseAccessor dba) {
+
+        SQLiteDatabase db = dba.getWritableDatabase();
 
         String selection = MiniQuestContract.COLUMN_MINIQUEST_STORY  + " = ?";
         String[] selectionArgs = { ((MiniQuest) object).getName() };
 
         int success = db.delete(MiniQuestContract.TABLE_NAME, selection, selectionArgs);
+
+        db.close();
 
         // if there were 0 rows effected then return false
         return success != 0;
