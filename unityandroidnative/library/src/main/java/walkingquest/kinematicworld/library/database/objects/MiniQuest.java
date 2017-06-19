@@ -43,7 +43,8 @@ public class MiniQuest extends BaseObject {
         this.active = active;
     }
 
-    public MiniQuest(String _ID, String name,
+    public MiniQuest(String _ID,
+                     String name,
                      String description,
                      String story,
                      short difficulty,

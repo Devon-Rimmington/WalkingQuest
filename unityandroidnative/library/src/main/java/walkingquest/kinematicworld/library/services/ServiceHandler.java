@@ -76,7 +76,7 @@ public class ServiceHandler extends Service {
             case "STEP":
                 // record a step in the database
                 SQLiteDatabase db = databaseAccessor.getWritableDatabase();
-                db.insert(StepLogContract.StepEntry.TABLE_NAME, null, StepLogContract.StepCommands.AddEntry());
+                db.insert(StepLogContract.TABLE_NAME, null, StepLogContract.StepCommands.AddEntry());
                 db.close();
                 steps++;
                 break;

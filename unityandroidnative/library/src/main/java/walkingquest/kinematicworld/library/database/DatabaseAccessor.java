@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import walkingquest.kinematicworld.library.database.debug.FillWithSampleData;
 import walkingquest.kinematicworld.library.database.sql.SQLTables;
 
 /**
@@ -29,6 +31,10 @@ public class DatabaseAccessor extends SQLiteOpenHelper {
         db.execSQL(SQLTables.StepLog.CREATE_TABLE_STEP_LOG);
         db.execSQL(SQLTables.MiniQuest.CREATE_TABLE_MINIQUESTS);
         db.execSQL(SQLTables.Event.CREATE_TABLE_EVENTS);
+
+        // this will fill the database with some extremely simple sample data
+        // todo make sample data more meaningful
+        FillWithSampleData.SampleData(db);
     }
 
     @Override
