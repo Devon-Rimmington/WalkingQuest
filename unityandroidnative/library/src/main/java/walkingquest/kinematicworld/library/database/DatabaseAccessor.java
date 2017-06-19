@@ -25,12 +25,17 @@ public class DatabaseAccessor extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(SQLTables.CREATE_TABLE_STEP_LOG);
+
+        db.execSQL(SQLTables.StepLog.CREATE_TABLE_STEP_LOG);
+        db.execSQL(SQLTables.MiniQuest.CREATE_TABLE_MINIQUESTS);
+        db.execSQL(SQLTables.Event.CREATE_TABLE_EVENTS);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
-        db.execSQL(SQLTables.DELETE_TABLE_STEP_LOG);
+        db.execSQL(SQLTables.StepLog.DELETE_TABLE_STEP_LOG);
+        db.execSQL(SQLTables.MiniQuest.DELETE_TABLE_MINIQUESTS);
+        db.execSQL(SQLTables.Event.DELETE_TABLE_EVENTS);
         onCreate(db);
     }
 

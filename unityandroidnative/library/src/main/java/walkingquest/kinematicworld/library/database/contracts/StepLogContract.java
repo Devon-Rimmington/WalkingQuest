@@ -22,6 +22,7 @@ public final class StepLogContract {
 
     }
 
+    // todo remove these and add a new class that will serve as the interface for the StepLog
     public static class StepCommands{
 
         public static ContentValues AddEntry(){
