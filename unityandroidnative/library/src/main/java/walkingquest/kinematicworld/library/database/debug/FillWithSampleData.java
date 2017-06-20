@@ -2,6 +2,7 @@ package walkingquest.kinematicworld.library.database.debug;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import walkingquest.kinematicworld.library.database.DatabaseAccessor;
 import walkingquest.kinematicworld.library.database.databaseHandlers.DatabaseHandler;
 import walkingquest.kinematicworld.library.database.databaseHandlers.EventHandler;
 import walkingquest.kinematicworld.library.database.databaseHandlers.MiniQuestHandler;

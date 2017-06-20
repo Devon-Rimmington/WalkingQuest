@@ -10,9 +10,15 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import java.util.Date;
+
 import walkingquest.kinematicworld.library.database.DatabaseAccessor;
 import walkingquest.kinematicworld.library.database.contracts.StepLogContract;
 import walkingquest.kinematicworld.library.database.databaseHandlers.EventHandler;
+import walkingquest.kinematicworld.library.database.databaseHandlers.StepLogHandler;
+import walkingquest.kinematicworld.library.database.debug.FillWithSampleData;
+import walkingquest.kinematicworld.library.database.objects.StepLog;
 
 
 /**
@@ -55,6 +61,11 @@ public class ServiceHandler extends Service {
 
         Log.d("Unity", "Handler Service Created");
 
+        SQLiteDatabase sqLiteDatabase = databaseAccessor.getWritableDatabase();
+        FillWithSampleData.SampleData(sqLiteDatabase, databaseAccessor.databaseHandler);
+        sqLiteDatabase.close();
+
+        Log.d("Unity", "Created sample data");
     }
 
     @Override
@@ -75,9 +86,16 @@ public class ServiceHandler extends Service {
 
         switch (msg){
             case "STEP":
-                // record a step in the database
-                databaseAccessor.databaseHandler = new EventHandler();
-                databaseAccessor.databaseHandler.insertObject(null, databaseAccessor);
+
+                // record a StepLog in the database
+                SQLiteDatabase db = databaseAccessor.getWritableDatabase();
+                databaseAccessor.databaseHandler = new StepLogHandler();
+                boolean success = databaseAccessor.databaseHandler.insertObject(new StepLog(new java.sql.Date(new Date().getTime()).toString()), db);
+                //db.close();
+
+                if(!success)
+                    Log.d("Unity", "Failure in adding steps to the StepLog");
+
                 steps++;
                 break;
             default:
@@ -90,9 +108,15 @@ public class ServiceHandler extends Service {
 
     // get the count of steps in the step log
     public long getSteps(){
+
         SQLiteDatabase db = databaseAccessor.getReadableDatabase();
-        long steps = StepLogContract.StepCommands.GetCompleteStepCount(db);
-        db.close();
+        databaseAccessor.databaseHandler = new StepLogHandler();
+        long steps = ((StepLogHandler)databaseAccessor.databaseHandler).getStepLogCount(db);
+
+        if(steps == -1)
+            Log.d("Unity", "Failure in getting number of steps in the StepLog");
+
+        //db.close();
 
         return steps;
     }

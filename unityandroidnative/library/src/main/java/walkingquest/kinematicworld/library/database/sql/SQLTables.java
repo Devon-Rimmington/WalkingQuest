@@ -37,7 +37,7 @@ public class SQLTables {
                         MiniQuestContract.COLUMN_MINIQUEST_ACTIVE + " BIT)";
 
         public static final String DELETE_TABLE_MINIQUESTS =
-                "DROP TABLE IF EXITS " + MiniQuestContract.TABLE_NAME;
+                "DROP TABLE IF EXISTS " + MiniQuestContract.TABLE_NAME;
     }
 
 
@@ -55,7 +55,7 @@ public class SQLTables {
 
 
         public static final String DELETE_TABLE_EVENTS =
-                "DROP TABLE IF EVENTS " + EventContract.TABLE_NAME;
+                "DROP TABLE IF EXISTS " + EventContract.TABLE_NAME;
     }
 
 }

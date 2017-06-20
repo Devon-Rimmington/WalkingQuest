@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import walkingquest.kinematicworld.library.database.DatabaseAccessor;
 import walkingquest.kinematicworld.library.database.contracts.MiniQuestContract;
@@ -20,9 +19,9 @@ public class MiniQuestHandler implements DatabaseHandler {
 
     // remember to cast the resulting objects as a miniquest
     @Override
-    public ArrayList<Object> getObjects(String[] projections, String selection, String[] selectionArgs, String sortOrder, DatabaseAccessor dba) {
+    public ArrayList<Object> getObjects(String[] projections, String selection, String[] selectionArgs, String sortOrder, SQLiteDatabase db) {
 
-        SQLiteDatabase db = dba.getReadableDatabase();
+        //SQLiteDatabase db = dba.getReadableDatabase();
 
         // execute the query
         Cursor cursor = db.query(
@@ -50,7 +49,7 @@ public class MiniQuestHandler implements DatabaseHandler {
         }
 
         cursor.close();
-        db.close();
+        //db.close();
 
         // if not objects can be found return null to indicate that no objects could be found or an error has occurred
         if(miniQuests.size() <= 0)
@@ -60,9 +59,9 @@ public class MiniQuestHandler implements DatabaseHandler {
     }
 
     @Override
-    public Object getObject(String[] projections, String selection, String[] selectionArgs, String sortOrder, DatabaseAccessor dba) {
+    public Object getObject(String[] projections, String selection, String[] selectionArgs, String sortOrder, SQLiteDatabase db) {
 
-        SQLiteDatabase db = dba.getReadableDatabase();
+        //SQLiteDatabase db = dba.getReadableDatabase();
 
         // execute the query
         Cursor cursor = db.query(
@@ -78,7 +77,7 @@ public class MiniQuestHandler implements DatabaseHandler {
         Object miniQuests = null;
 
         // isFirst and isLast will tell us if their is only one item in the list
-        while(!cursor.isFirst() && !cursor.isLast()){
+        if(cursor.moveToFirst()){
             miniQuests = new MiniQuest(
                     Long.toString(cursor.getLong(0)),   // id
                     cursor.getString(1),                // name
@@ -92,15 +91,15 @@ public class MiniQuestHandler implements DatabaseHandler {
         }
 
         cursor.close();
-        db.close();
+        //db.close();
 
         return miniQuests;
     }
 
     @Override
-    public boolean insertObject(Object object, DatabaseAccessor dba) {
+    public boolean insertObject(Object object, SQLiteDatabase db) {
 
-        SQLiteDatabase db = dba.getWritableDatabase();
+        //SQLiteDatabase db = dba.getWritableDatabase();
 
         MiniQuest miniQuest = (MiniQuest) object;
 
@@ -115,16 +114,16 @@ public class MiniQuestHandler implements DatabaseHandler {
 
         long id = db.insert(MiniQuestContract.TABLE_NAME, null, values);
 
-        db.close();
+        //db.close();
 
         // returns if the insert was a success
         return id != -1;
     }
 
     @Override
-    public boolean updateObject(Object object, DatabaseAccessor dba) {
+    public boolean updateObject(Object object, SQLiteDatabase db) {
 
-        SQLiteDatabase db = dba.getWritableDatabase();
+        //SQLiteDatabase db = dba.getWritableDatabase();
 
         MiniQuest miniQuest = (MiniQuest) object;
 
@@ -142,23 +141,23 @@ public class MiniQuestHandler implements DatabaseHandler {
 
         int count = db.update(MiniQuestContract.TABLE_NAME, values, selection, selectionArgs);
 
-        db.close();
+        //db.close();
 
         // returns if any rows have been updated
         return count != 0;
     }
 
     @Override
-    public boolean deleteObject(Object object, DatabaseAccessor dba) {
+    public boolean deleteObject(Object object, SQLiteDatabase db) {
 
-        SQLiteDatabase db = dba.getWritableDatabase();
+        //SQLiteDatabase db = dba.getWritableDatabase();
 
         String selection = MiniQuestContract.COLUMN_MINIQUEST_STORY  + " = ?";
         String[] selectionArgs = { ((MiniQuest) object).getName() };
 
         int success = db.delete(MiniQuestContract.TABLE_NAME, selection, selectionArgs);
 
-        db.close();
+        //db.close();
 
         // if there were 0 rows effected then return false
         return success != 0;
