@@ -21,8 +21,6 @@ public class BootReceiver extends BroadcastReceiver {
                 Log.i("Unity", "Broadcast Received");
                 context.startService(new Intent(context, ServiceHandler.class));
                 break;
-            case Intent.ACTION_REBOOT:
-                break;
             default:
                 break;
         }
