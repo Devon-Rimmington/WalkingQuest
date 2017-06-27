@@ -1,42 +1,51 @@
 package walkingquest.kinematicworld.library.database.objects;
 
 /**
- * Created by Devon on 6/18/2017.
+ * Created by Devon on 6/23/2017.
  */
 
-public class Event extends BaseObject {
+public class Event extends BaseObject{
 
-    private String name, description, story, howTo;
-    private short difficulty, type;
+    private String name, description, story, successStory, failStory;
+    private short eventType;
+    private boolean active;
 
-    public Event(){
-        this._ID = null;
-        this.name = null;
-        this.description = null;
-        this.story = null;
-        this.difficulty = -1;
-        this.howTo = null;
-        this.type = -1;
-    }
+    public Event(){}
 
-    public Event(String name, String description, String story, short difficulty, String howTo, short type){
-        this._ID = null;
+    public Event(String name,
+                 String description,
+                 String story,
+                 String successStory,
+                 String failStory,
+                 short eventType,
+                 boolean active){
+
         this.name = name;
         this.description = description;
         this.story = story;
-        this.difficulty = difficulty;
-        this.howTo = howTo;
-        this.type = type;
+        this.successStory = successStory;
+        this.failStory = failStory;
+        this.eventType = eventType;
+        this.active = active;
     }
 
-    public Event(String _ID, String name, String description, String story, short difficulty, String howTo, short type){
-        this._ID = _ID;
+    public Event(long _id,
+                 String name,
+                 String description,
+                 String story,
+                 String successStory,
+                 String failStory,
+                 short eventType,
+                 boolean active){
+
+        this._id = _id;
         this.name = name;
         this.description = description;
         this.story = story;
-        this.difficulty = difficulty;
-        this.howTo = howTo;
-        this.type = type;
+        this.successStory = successStory;
+        this.failStory = failStory;
+        this.eventType = eventType;
+        this.active = active;
     }
 
     public String getName() {
@@ -63,27 +72,35 @@ public class Event extends BaseObject {
         this.story = story;
     }
 
-    public String getHowTo() {
-        return howTo;
+    public String getSuccessStory() {
+        return successStory;
     }
 
-    public void setHowTo(String howTo) {
-        this.howTo = howTo;
+    public void setSuccessStory(String successStory) {
+        this.successStory = successStory;
     }
 
-    public short getDifficulty() {
-        return difficulty;
+    public String getFailStory() {
+        return failStory;
     }
 
-    public void setDifficulty(short difficulty) {
-        this.difficulty = difficulty;
+    public void setFailStory(String failStory) {
+        this.failStory = failStory;
     }
 
-    public short getType() {
-        return type;
+    public short getEventType() {
+        return eventType;
     }
 
-    public void setType(short type) {
-        this.type = type;
+    public void setEventType(short eventType) {
+        this.eventType = eventType;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

@@ -1,62 +1,50 @@
 package walkingquest.kinematicworld.library.database.objects;
 
 /**
- * Created by Devon on 6/18/2017.
+ * Created by Devon on 6/23/2017.
  */
 
-public class MiniQuest extends BaseObject {
+public class MiniQuest extends BaseObject{
 
-    private String name,
-            description,
-            story;
-    private short difficulty;
+    private String name, description, story, successStory, failStory;
     private long requiredSteps, completedSteps;
     private boolean active;
 
-    public MiniQuest(){
-
-        this._ID = null;
-        this.name = null;
-        this.description = null;
-        this.story = null;
-        this.difficulty = -1;
-        this.requiredSteps = -1;
-        this.completedSteps = -1;
-        this.active = false;
-    }
+    public MiniQuest(){}
 
     public MiniQuest(String name,
                      String description,
                      String story,
-                     short difficulty,
+                     String successStory,
+                     String failStory,
                      long requiredSteps,
                      long completedSteps,
                      boolean active){
-
-        this._ID = null;
         this.name = name;
         this.description = description;
         this.story = story;
-        this.difficulty = difficulty;
+        this.successStory = successStory;
+        this.failStory = failStory;
         this.requiredSteps = requiredSteps;
         this.completedSteps = completedSteps;
         this.active = active;
     }
 
-    public MiniQuest(String _ID,
+    public MiniQuest(long _id,
                      String name,
                      String description,
                      String story,
-                     short difficulty,
+                     String successStory,
+                     String failStory,
                      long requiredSteps,
                      long completedSteps,
                      boolean active){
-
-        this._ID = _ID;
+        this._id = _id;
         this.name = name;
         this.description = description;
         this.story = story;
-        this.difficulty = difficulty;
+        this.successStory = successStory;
+        this.failStory = failStory;
         this.requiredSteps = requiredSteps;
         this.completedSteps = completedSteps;
         this.active = active;
@@ -86,12 +74,20 @@ public class MiniQuest extends BaseObject {
         this.story = story;
     }
 
-    public short getDifficulty() {
-        return difficulty;
+    public String getSuccessStory() {
+        return successStory;
     }
 
-    public void setDifficulty(short difficulty) {
-        this.difficulty = difficulty;
+    public void setSuccessStory(String successStory) {
+        this.successStory = successStory;
+    }
+
+    public String getFailStory() {
+        return failStory;
+    }
+
+    public void setFailStory(String failStory) {
+        this.failStory = failStory;
     }
 
     public long getRequiredSteps() {
@@ -116,5 +112,11 @@ public class MiniQuest extends BaseObject {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    // Other code
+
+    public boolean isComplete(){
+        return requiredSteps <= completedSteps;
     }
 }

@@ -12,6 +12,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import walkingquest.kinematicworld.library.R;
+
 /**
  * Created by Devon on 6/15/2017.
  */
@@ -48,9 +50,9 @@ public class TimerService extends Service {
     public void invokeNotification(String msg){
 
         if(serviceHandlerRegistered){
-            /*
+
             // todo remove this hardcoding
-            long stepsRequired = 100;
+            long stepsRequired = 10;
             // push a notification about the quest being done
             if(mServiceHandler.getSteps() >= stepsRequired){
 
@@ -58,7 +60,7 @@ public class TimerService extends Service {
 
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(this)
-                                .setSmallIcon(R.drawable.sun)
+                                .setSmallIcon(R.drawable.title_1)
                                 .setContentTitle("My notification")
                                 .setContentText("Hello World!");
 
@@ -67,7 +69,7 @@ public class TimerService extends Service {
 
                 mNotificationManager.notify(0, mBuilder.build());
             }
-            */
+
         }
 
     }

@@ -1,19 +1,20 @@
 package walkingquest.kinematicworld.library.database.objects;
 
 /**
- * Created by Devon on 6/18/2017.
+ * Created by Devon on 6/23/2017.
  */
 
 public class BaseObject {
 
-    protected String _ID = null;
+    protected long _id;
 
-    public String get_ID() {
-        return _ID;
+    public BaseObject(){}
+
+    public long get_id() {
+        return _id;
     }
 
-    public void set_ID(String _ID) {
-        this._ID = _ID;
+    public void set_id(long _id) {
+        this._id = _id;
     }
-
 }

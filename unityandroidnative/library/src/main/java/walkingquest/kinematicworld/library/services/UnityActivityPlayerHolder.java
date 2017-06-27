@@ -41,7 +41,7 @@ public class UnityActivityPlayerHolder {
     public static long getSteps(){
 
         if(serviceHandlerRegistered) {
-            Log.d("Unity", "getting steps " +mServiceHandler.getSteps());
+            // Log.d("Unity", "getting steps " +mServiceHandler.getSteps());
             return mServiceHandler.getSteps();
         }
         else
