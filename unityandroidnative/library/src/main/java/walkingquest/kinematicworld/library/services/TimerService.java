@@ -52,9 +52,9 @@ public class TimerService extends Service {
         if(serviceHandlerRegistered){
 
             // todo remove this hardcoding
-            long stepsRequired = 10;
+            long stepsRequired = 2000;
             // push a notification about the quest being done
-            if(mServiceHandler.getSteps() >= stepsRequired){
+            if((mServiceHandler.getSteps() % stepsRequired) == 0){
 
                 //todo create a proper notification that opens the game (to the correct state?)
 

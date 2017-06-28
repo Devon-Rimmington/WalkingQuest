@@ -5,14 +5,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import walkingquest.kinematicworld.library.database.objects.Event;
-import walkingquest.kinematicworld.library.database.objects.MiniQuest;
+import walkingquest.kinematicworld.library.database.DatabaseAccessor;
 
 
 /**
@@ -29,20 +27,16 @@ public class ServiceHandler extends Service {
     private TimerService mTimerService;
     private boolean timerServiceRegistered;
 
+    private DatabaseAccessor databaseAccessor;
     private long steps;
 
-    // private DatabaseAccessor databaseAccessor;
-
     // Objects to be passed upto the
-    private Event event;
-    private MiniQuest miniQuest;
-
 
     @Override
     public void onCreate(){
 
-        Log.d("Unity", "Handler Service Create");
-
+        // setting up the native data inputs
+        databaseAccessor = new DatabaseAccessor(this);
         steps = 0;
 
         // bind this service to the timer service to push and pull information from it
@@ -54,16 +48,6 @@ public class ServiceHandler extends Service {
         Intent stepIntent = new Intent(this, StepCounterService.class);
         startService(stepIntent);
         bindService(stepIntent, stepServiceConnection, Context.BIND_AUTO_CREATE);
-
-        // databaseAccessor = new DatabaseAccessor(getApplicationContext());
-
-        Log.d("Unity", "Handler Service Created");
-
-        // SQLiteDatabase sqLiteDatabase = databaseAccessor.getWritableDatabase();
-        // FillWithSampleData.SampleData(sqLiteDatabase, databaseAccessor.databaseHandler);
-        // sqLiteDatabase.close();
-
-        Log.d("Unity", "Created sample data");
     }
 
     @Override

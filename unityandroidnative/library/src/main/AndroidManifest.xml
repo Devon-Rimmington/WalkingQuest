@@ -12,7 +12,7 @@
         <service android:name=".services.TimerService" android:enabled="true"/>
         <service android:name=".services.StepCounterService" android:enabled="true"/>
 
-        <receiver android:name="broadcast.BootReceiver"  android:exported="true">
+        <receiver android:name="walkingquest.kinematicworld.library.broadcast.BootReceiver"  android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
