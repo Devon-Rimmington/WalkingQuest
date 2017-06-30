@@ -3,6 +3,8 @@ package walkingquest.kinematicworld.library.database.databaseHandlers;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Debug;
+import android.util.Log;
 
 import walkingquest.kinematicworld.library.database.contracts.NativeDataContract;
 import walkingquest.kinematicworld.library.database.objects.NativeData;
@@ -18,15 +20,15 @@ public class NativeDataHandler {
                 NativeDataContract._ID,
                 NativeDataContract.COLUMN_USER_ID,
                 NativeDataContract.COLUMN_CHARACTER_ID,
-                NativeDataContract.COLUMN_MINI_QUEST_AVAILABLE,
-                NativeDataContract.COLUMN_MINI_QUEST_AVAILABLE,
+                NativeDataContract.COLUMN_ACTIVE_EVENT_AVAILABLE_COUNT,
                 NativeDataContract.COLUMN_MINI_QUEST_ID,
                 NativeDataContract.COLUMN_MINI_QUEST_STEPS_REQUIRED,
                 NativeDataContract.COLUMN_MINI_QUEST_STEPS_COMPLETED,
                 NativeDataContract.COLUMN_MINI_QUEST_START_TIME,
                 NativeDataContract.COLUMN_TOTAL_USER_STEPS,
-                NativeDataContract.COLUMN_TRIP_COUNTER_STEPS
-        }, "1 = ?", new String[]{"1"}, db);
+                NativeDataContract.COLUMN_TRIP_COUNTER_STEPS,
+                NativeDataContract.COLUMN_MINI_QUEST_AVAILABLE
+        }, null, null, db);
     }
 
     public static NativeData getNativeData(String[] projections, String selection, String[] selectionArgs, SQLiteDatabase db){
@@ -41,7 +43,15 @@ public class NativeDataHandler {
                 null, null, null
         );
 
+        cursor.moveToFirst();
+        while(cursor.moveToNext()){
+            Log.i("Unity", "Entry");
+        }
+
         if(cursor.moveToFirst()) {
+
+            Log.i("Unity", "getting native data result");
+
             nativeData = new NativeData(
                     cursor.getString(1),
                     cursor.getLong(2),
@@ -52,10 +62,11 @@ public class NativeDataHandler {
                     cursor.getLong(7),
                     cursor.getLong(8),
                     cursor.getLong(9),
-                    (1 == cursor.getInt(9))
+                    (1 == cursor.getInt(10))
             );
-        }
 
+            Log.i("Unity", "title " + cursor.getString(1));
+        }
         cursor.close();
 
         return nativeData;
@@ -85,8 +96,11 @@ public class NativeDataHandler {
 
     public static boolean updateNativeData(NativeData nativeData, SQLiteDatabase db){
 
-        String selection = "1 = ?";
-        String[] selectionArgs = {"1"};
+
+        Log.i("Unity", nativeData.getTripCounterSteps() + " " + nativeData.getUserTotalStepCount());
+
+        String selection = NativeDataContract.COLUMN_USER_ID + " = ?";
+        String[] selectionArgs = {nativeData.getUserId()};
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(NativeDataContract.COLUMN_USER_ID, nativeData.getUserId());
@@ -102,7 +116,7 @@ public class NativeDataHandler {
 
 
         int count = db.update(NativeDataContract.TABLE_NAME,
-                contentValues, selection, selectionArgs);
+                contentValues, null, null);
 
         // return if the entry gets updated
         return count != 0;

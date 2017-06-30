@@ -122,4 +122,8 @@ public class NativeData {
     public void setAvailableMiniQuest(boolean availableMiniQuest) {
         this.availableMiniQuest = availableMiniQuest;
     }
+
+    public String toString(){
+        return this.userId + " " + this.characterId + " " + this.getTripCounterSteps() + " " + this.getUserTotalStepCount();
+    }
 }

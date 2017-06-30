@@ -14,7 +14,7 @@ import walkingquest.kinematicworld.library.database.sql.SQLTables;
 
 public class DatabaseAccessor extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 7;
     public static final String DATABASE_NAME = "walkingquest.db";
 
     public DatabaseAccessor(Context context) {

@@ -30,9 +30,7 @@ public class UnityActivityPlayerHolder {
 
     }
 
-    public static void Update(){
-
-    }
+    public static void Update(){}
 
     public static void Unbind(){
         unityActivity.unbindService(serviceHandlerConnection);
@@ -42,7 +40,7 @@ public class UnityActivityPlayerHolder {
 
         if(serviceHandlerRegistered) {
             // Log.d("Unity", "getting steps " +mServiceHandler.getSteps());
-            return mServiceHandler.getSteps();
+            return mServiceHandler.getTotalSteps();
         }
         else
             return -1;
