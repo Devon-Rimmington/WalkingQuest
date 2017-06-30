@@ -23,7 +23,7 @@ public class FirebaseLogin : MonoBehaviour {
 	public Text warnings;
 
 	// group of buttons that will animate when the player toggles create new account
-	public GameObject buttonGroup;
+	public GameObject buttonGroup, buttonGroupAll;
 
 	// public string email = "devonrimmington@gmail.com", password = "password";
 
@@ -71,6 +71,10 @@ public class FirebaseLogin : MonoBehaviour {
 			string jsonTest = JsonUtility.ToJson (test);
 			Debug.Log(jsonTest);
 			reference.Child ("users").Child(auth.CurrentUser.UserId).SetRawJsonValueAsync (jsonTest);
+
+
+			// remove the login information as we have just logged in the player
+			removeLoginScreen();
 		}
 
 	}
@@ -108,6 +112,10 @@ public class FirebaseLogin : MonoBehaviour {
 				string jsonTest = JsonUtility.ToJson (test);
 				Debug.Log (jsonTest);
 				reference.Child ("users").Child (newUser.UserId).SetRawJsonValueAsync (jsonTest);
+
+
+				// remove the login information as we have just logged in the player
+				removeLoginScreen();
 			});
 		}
 	}
@@ -135,9 +143,13 @@ public class FirebaseLogin : MonoBehaviour {
 			Test test = new Test ("200");
 			string jsonTest = JsonUtility.ToJson (test);
 
-			Debug.Log(jsonTest);
+			// Debug.Log(jsonTest);
 
 			reference.Child ("users").Child(newUser.UserId).SetRawJsonValueAsync (jsonTest);
+
+			// remove the login information as we have just logged in the player
+			removeLoginScreen();
+
 		});	
 	}
 
@@ -196,6 +208,10 @@ public class FirebaseLogin : MonoBehaviour {
 		}		
 		// if there isn't a problem
 		return true;
+	}
+
+	public void removeLoginScreen(){
+		buttonGroup.GetComponents<Animator> () [0].SetBool ("loginShow", false);
 	}
 
 }

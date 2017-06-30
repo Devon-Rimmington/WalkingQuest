@@ -40,7 +40,7 @@ public class ServiceHandler extends Service {
 
     private DatabaseAccessor databaseAccessor;
     private SQLiteDatabase sqLiteDatabase;
-    private NativeData nativeData;
+    private NativeData nativeData = null;
     private long steps;
 
     // variables for the timer
@@ -156,16 +156,137 @@ public class ServiceHandler extends Service {
         }
     }
 
-    // get the step count
-    public long getTotalSteps(){
-        return nativeData.getUserTotalStepCount();
+    /**************************************************************
+     * GET NATIVE DATA INFORMATION
+     * ************************************************************/
+
+    // check if nativeData has been set
+    public boolean isNativeDataAvailable(){ return nativeData != null; }
+
+    // set the userId in nativeData
+    public boolean setUserId(String userId){
+        if(isNativeDataAvailable()){
+            nativeData.setUserId(userId);
+            if(NativeDataHandler.updateNativeData(nativeData, sqLiteDatabase)){
+                nativeData = NativeDataHandler.getNativeData(sqLiteDatabase);
+                return true;
+            }
+        }
+        return false;
     }
 
-    // set the step count
-    public void setTotalSteps(long steps){
-        Log.d("Unity", "Setting Steps " + steps);
-        nativeData.setUserTotalStepCount(steps);
+    // set the character in the nativeData
+    public boolean setCharacterId(long characterId){
+        if(isNativeDataAvailable()){
+            nativeData.setCharacterId(characterId);
+            if(NativeDataHandler.updateNativeData(nativeData, sqLiteDatabase)){
+                nativeData = NativeDataHandler.getNativeData(sqLiteDatabase);
+                return true;
+            }
+        }
+        return false;
     }
+
+    // get the number of steps that have been put towards completing a miniquest
+    public long getStepsCompleted(){
+        if(isNativeDataAvailable()){
+            return nativeData.getMiniquestStepCompleted();
+        }
+        return -1;
+    }
+
+    // get the number of steps that the player needs to complete the miniquest
+    public long getStepsRequired(){
+        if(isNativeDataAvailable()){
+            return nativeData.getMiniquestStepRequired();
+        }
+        return -1;
+    }
+
+    // get the step count from nativeData
+    public long getTotalSteps(){
+        if(isNativeDataAvailable()) {
+            return nativeData.getUserTotalStepCount();
+        }
+        return -1;
+    }
+
+    // set a new miniquest for the service to record
+    public boolean setMiniQuest(long miniquestId, long completedSteps, long requiredSteps){
+        if(isNativeDataAvailable()){
+            nativeData.setMiniquestId(miniquestId);
+            nativeData.setMiniquestStepCompleted(completedSteps);
+            nativeData.setMiniquestStepRequired(requiredSteps);
+            if(NativeDataHandler.updateNativeData(nativeData, sqLiteDatabase)){
+                nativeData = NativeDataHandler.getNativeData(sqLiteDatabase);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // set a new miniquest for the service to record with a start time
+    public boolean setMiniQuest(long miniquestId, long completedSteps, long requiredSteps, long startTime){
+        if(isNativeDataAvailable()){
+            nativeData.setMiniquestId(miniquestId);
+            nativeData.setMiniquestStepCompleted(completedSteps);
+            nativeData.setMiniquestStepRequired(requiredSteps);
+            nativeData.setMiniquestStartTime(startTime);
+            if(NativeDataHandler.updateNativeData(nativeData, sqLiteDatabase)){
+                nativeData = NativeDataHandler.getNativeData(sqLiteDatabase);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // get the number of active events that have been earned and banked by the user
+    public long getNumberOfEvents(){
+        if(isNativeDataAvailable()){
+            return nativeData.getAvailableEventCount();
+        }
+        return -1;
+    }
+
+    // get whether or not a miniquest is available for the player to choose
+    public boolean getMiniQuestAvailable(){
+        if(isNativeDataAvailable()){
+            return nativeData.isAvailableMiniQuest();
+        }
+        return false;
+    }
+
+    // get the number of steps recorded by the trip counter
+    public long getTripSteps(){
+        if(isNativeDataAvailable()){
+            return nativeData.getTripCounterSteps();
+        }
+        return -1;
+    }
+
+    public boolean resetTripSteps(){
+        if(isNativeDataAvailable()){
+            nativeData.setTripCounterSteps(0);
+            if(NativeDataHandler.updateNativeData(nativeData, sqLiteDatabase)){
+                nativeData = NativeDataHandler.getNativeData(sqLiteDatabase);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /*
+    // set the step count to nativeData
+    public void setTotalSteps(long steps){
+        if(isNativeDataAvailable()) {
+            Log.d("Unity", "Setting Steps " + steps);
+            nativeData.setUserTotalStepCount(steps);
+        }
+    }
+    */
 
     // if the database has no entry yet then set an initial entry
     private void setupNativeDataEntry(){
@@ -179,6 +300,8 @@ public class ServiceHandler extends Service {
             Log.i("Unity", "We have a problem");
         }
     }
+
+    /***************************************************************************************/
 
     private void miniQuestCompletedNotification(){
 

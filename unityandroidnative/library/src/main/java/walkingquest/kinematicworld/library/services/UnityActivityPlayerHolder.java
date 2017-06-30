@@ -36,15 +36,90 @@ public class UnityActivityPlayerHolder {
         unityActivity.unbindService(serviceHandlerConnection);
     }
 
-    public static long getSteps(){
 
-        if(serviceHandlerRegistered) {
-            // Log.d("Unity", "getting steps " +mServiceHandler.getSteps());
-            return mServiceHandler.getTotalSteps();
-        }
-        else
-            return -1;
+    /*************************************************************************
+     * GET NATIVE DATA INFORMATION
+     *************************************************************************/
+
+    // when a user logs in change (or set on first login) the userId that is assigned to the service
+    // should we hash this while it's being stored perhaps this could prevent hacking???
+    // todo implement hashing on the userId
+    public static boolean setUser(String userId){
+        if(serviceHandlerRegistered)
+            return mServiceHandler.setUserId(userId);
+        return false;
     }
+
+    // sets the currently active character
+    public static boolean setCharacterId(long characterId){
+        if(serviceHandlerRegistered)
+            return mServiceHandler.setCharacterId(characterId);
+        return false;
+    }
+
+    // get the steps completed towards a miniquest
+    public static long getStepsCompleted(){
+        if(serviceHandlerRegistered)
+            return mServiceHandler.getStepsCompleted();
+        return -1;
+    }
+
+    public static long getStepsRequired(){
+        if(serviceHandlerRegistered)
+            return mServiceHandler.getStepsRequired();
+        return -1;
+    }
+
+    // set the miniquest information used to store the miniquest in the service (this might not be used)
+    public static boolean setMiniQuest(long miniquestId, long miniquestCompletedSteps, long miniquestRequiredSteps){
+        if(serviceHandlerRegistered)
+            return mServiceHandler.setMiniQuest(miniquestId, miniquestCompletedSteps, miniquestRequiredSteps);
+        return false;
+    }
+
+    // use this if no miniquest was currently active
+    public static boolean setMiniQuest(long miniquestId, long miniquestCompletedSteps, long miniquestRequiredSteps, long startTime){
+        if(serviceHandlerRegistered)
+            return mServiceHandler.setMiniQuest(miniquestId, miniquestCompletedSteps, miniquestRequiredSteps, startTime);
+        return false;
+    }
+
+    // get the number of active events that the player has to play
+    public static long getNumberOfEvents(){
+        if(serviceHandlerRegistered)
+            return mServiceHandler.getNumberOfEvents();
+        return -1;
+    }
+
+    // gets whether or not a miniquest is available for the player to play
+    public static boolean getQuestAvailable(){
+        if(serviceHandlerRegistered)
+            return mServiceHandler.getMiniQuestAvailable();
+        return false;
+    }
+
+    // get the total number of steps the player has taken since install
+    public static long getTotalSteps(){
+        if(serviceHandlerRegistered)
+            return mServiceHandler.getTotalSteps();
+        return -1;
+    }
+
+    // get the number of steps from the trip counter
+    public static long getTripSteps(){
+        if(serviceHandlerRegistered)
+            return mServiceHandler.getTripSteps();
+        return -1;
+    }
+
+    // reset the trip counter
+    public static boolean resetTripSteps(){
+        if(serviceHandlerRegistered)
+            return mServiceHandler.resetTripSteps();
+        return false;
+    }
+
+    /******************************************************************/
 
     public static boolean getServiceHandlerRegistered(){
         return serviceHandlerRegistered;
