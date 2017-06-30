@@ -42,6 +42,13 @@ public class FirebaseLogin : MonoBehaviour {
 
 		// signup/login with basic account
 		// BasicAuthentication ();
+
+		// check if the player has an account logged in
+		Firebase.Auth.FirebaseAuth auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+		if (auth.CurrentUser != null) {
+			removeLoginScreen ();
+		}
+
 	}
 
 	// Update is called once per frame
@@ -64,19 +71,7 @@ public class FirebaseLogin : MonoBehaviour {
 			} else { 											// if the player already has an account
 				LoginBasicAccount (email.text, password.text);
 			}
-		} else {
-
-			// this is a test
-			Test test = new Test ("201");
-			string jsonTest = JsonUtility.ToJson (test);
-			Debug.Log(jsonTest);
-			reference.Child ("users").Child(auth.CurrentUser.UserId).SetRawJsonValueAsync (jsonTest);
-
-
-			// remove the login information as we have just logged in the player
-			removeLoginScreen();
 		}
-
 	}
 
 	// if the player would like to make a new account to signin with
@@ -108,7 +103,7 @@ public class FirebaseLogin : MonoBehaviour {
 				// save the players profile and other information
 
 				// this is a test
-				Test test = new Test ("203");
+				Test test = new Test ("fneineinf");
 				string jsonTest = JsonUtility.ToJson (test);
 				Debug.Log (jsonTest);
 				reference.Child ("users").Child (newUser.UserId).SetRawJsonValueAsync (jsonTest);
@@ -140,15 +135,19 @@ public class FirebaseLogin : MonoBehaviour {
 				newUser.DisplayName, newUser.UserId);
 
 			// this is a test
-			Test test = new Test ("200");
+			Test test = new Test ("fwmmowmdmenn");
 			string jsonTest = JsonUtility.ToJson (test);
 
-			// Debug.Log(jsonTest);
+			Debug.Log(jsonTest);
 
 			reference.Child ("users").Child(newUser.UserId).SetRawJsonValueAsync (jsonTest);
 
+			Debug.Log("doneNot!");
+
 			// remove the login information as we have just logged in the player
 			removeLoginScreen();
+
+			Debug.Log("done");
 
 		});	
 	}
@@ -211,7 +210,7 @@ public class FirebaseLogin : MonoBehaviour {
 	}
 
 	public void removeLoginScreen(){
-		buttonGroup.GetComponents<Animator> () [0].SetBool ("loginShow", false);
+		((Animator)buttonGroupAll.GetComponents<Animator> () [0]).SetBool ("loginShow", false);
 	}
 
 }

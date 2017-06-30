@@ -18,16 +18,16 @@ public class NativeController : MonoBehaviour {
 		nativeAccessor = new AndroidJavaClass("walkingquest.kinematicworld.library.services.UnityActivityPlayerHolder");
 		nativeAccessor.CallStatic("StartServices", unityActivity);
 
-		Debug.Log(nativeAccessor.CallStatic<long> ("getSteps"));
-		steps = nativeAccessor.CallStatic<long> ("getSteps");
+		Debug.Log(nativeAccessor.CallStatic<long> ("getTotalSteps"));
+		steps = nativeAccessor.CallStatic<long> ("getTotalSteps");
 	}
 
 	// Update is called once per frame
 	void Update () {
 
-		if (steps != nativeAccessor.CallStatic<long> ("getSteps")) {
-			steps = nativeAccessor.CallStatic<long> ("getSteps");
-			Debug.Log(nativeAccessor.CallStatic<long> ("getSteps"));
+		if (steps != nativeAccessor.CallStatic<long> ("getTotalSteps")) {
+			steps = nativeAccessor.CallStatic<long> ("getTotalSteps");
+			// Debug.Log(nativeAccessor.CallStatic<long> ("getSteps"));
 		}
 		//Debug.Log(customClass.CallStatic<long> ("getSteps"));
 	}
