@@ -1,5 +1,6 @@
 package walkingquest.kinematicworld.library.services;
 
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -7,11 +8,20 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import walkingquest.kinematicworld.library.R;
 import walkingquest.kinematicworld.library.database.DatabaseAccessor;
-import walkingquest.kinematicworld.library.database.contracts.StepLogContract;
+import walkingquest.kinematicworld.library.database.databaseHandlers.NativeDataHandler;
+import walkingquest.kinematicworld.library.database.objects.NativeData;
 
 
 /**
@@ -28,17 +38,31 @@ public class ServiceHandler extends Service {
     private TimerService mTimerService;
     private boolean timerServiceRegistered;
 
+    private DatabaseAccessor databaseAccessor;
+    private SQLiteDatabase sqLiteDatabase;
+    private NativeData nativeData;
     private long steps;
 
-    private DatabaseAccessor databaseAccessor;
+    // variables for the timer
+    private static final long MiniQuestNotificationTimeDelay = 20*60*1000; // 1 minute todo change to 20 minutes
+    private Timer timer;
+    private Handler handler = new Handler();
 
 
     @Override
     public void onCreate(){
 
-        Log.d("Unity", "Handler Service Create");
+        // setting up the native data inputs
+        databaseAccessor = new DatabaseAccessor(this);
+        sqLiteDatabase = databaseAccessor.getWritableDatabase();
+
+        if((nativeData = NativeDataHandler.getNativeData(sqLiteDatabase)) == null){
+            setupNativeDataEntry();
+        }
 
         steps = 0;
+        // start the timer for creating a new miniquest
+        startMiniQuestTimer();
 
         // bind this service to the timer service to push and pull information from it
         Intent timerIntent = new Intent(this, TimerService.class);
@@ -49,11 +73,6 @@ public class ServiceHandler extends Service {
         Intent stepIntent = new Intent(this, StepCounterService.class);
         startService(stepIntent);
         bindService(stepIntent, stepServiceConnection, Context.BIND_AUTO_CREATE);
-
-        databaseAccessor = new DatabaseAccessor(getApplicationContext());
-
-        Log.d("Unity", "Handler Service Created");
-
     }
 
     @Override
@@ -67,45 +86,128 @@ public class ServiceHandler extends Service {
     }
 
     public void Update(){
-
+        mTimerService.Update("MINIQUESTTIMER");
     }
 
     public void Update(String msg){
 
         switch (msg){
             case "STEP":
-                // record a step in the database
-                SQLiteDatabase db = databaseAccessor.getWritableDatabase();
-                db.insert(StepLogContract.StepEntry.TABLE_NAME, null, StepLogContract.StepCommands.AddEntry());
-                db.close();
                 steps++;
+
+                // increase the trip counter
+                long tripCount = nativeData.getTripCounterSteps();
+                tripCount++;
+                nativeData.setTripCounterSteps(tripCount);
+
+                // increase the total steps
+                long stepCount = nativeData.getUserTotalStepCount();
+                stepCount++;
+                nativeData.setUserTotalStepCount(stepCount);
+
+                // if a miniquest exists and the miniquest_id has been set (aka a quest has been accepted)
+                if(nativeData.isAvailableMiniQuest() && nativeData.getMiniquestId() != 0){
+                    long questStepCount = nativeData.getMiniquestStepCompleted();
+                    questStepCount++;
+                    nativeData.setMiniquestStepCompleted(questStepCount);
+
+                    // check if the miniquest has been completed
+                    if(nativeData.getMiniquestStepCompleted() >= nativeData.getMiniquestStepRequired()){
+
+                        // if the miniquest is completed change the nativeData
+                        nativeData.setAvailableMiniQuest(false);
+                        nativeData.setMiniquestId(0);
+
+                        // notify the user
+                        miniQuestCompletedNotification();
+                    }
+                }
+
+                mTimerService.Update("ACTIVEEVENT");
+
+                Log.d("Unity", "The steps from the NativeData is " + nativeData.getUserTotalStepCount());
                 break;
-            default:
+
+            case "NEWEVENT":
+
+                // increase the number of events the player has access to
+                long numberOfEvents = nativeData.getAvailableEventCount();
+                numberOfEvents++;
+                nativeData.setAvailableEventCount(numberOfEvents);
+
+                //todo create a proper notification that opens the game (to the correct state?)
+                NotificationCompat.Builder mBuilder =
+                        new NotificationCompat.Builder(this)
+                                .setSmallIcon(R.drawable.title_1)
+                                .setContentTitle("A New Event")
+                                .setContentText("A new event is available for you to play");
+
+                NotificationManager mNotificationManager =
+                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+                mNotificationManager.notify(1, mBuilder.build());
+                break;
+        default:
                 break;
         }
 
-        mTimerService.Update();
-
+        if(NativeDataHandler.updateNativeData(nativeData, sqLiteDatabase)) {
+            nativeData = NativeDataHandler.getNativeData(sqLiteDatabase);
+        }
     }
 
-    // get the count of steps in the step log
-    public long getSteps(){
-        SQLiteDatabase db = databaseAccessor.getReadableDatabase();
-        long steps = StepLogContract.StepCommands.GetCompleteStepCount(db);
-        db.close();
-
-        return steps;
+    // get the step count
+    public long getTotalSteps(){
+        return nativeData.getUserTotalStepCount();
     }
 
-    public void setSteps(long steps){
+    // set the step count
+    public void setTotalSteps(long steps){
         Log.d("Unity", "Setting Steps " + steps);
-        this.steps = steps;
+        nativeData.setUserTotalStepCount(steps);
     }
 
+    // if the database has no entry yet then set an initial entry
+    private void setupNativeDataEntry(){
 
+        NativeData _nativeData = new NativeData("test", 0, 0, 0, 0, 0, 0, 0, 0, false);
+        if(NativeDataHandler.insertNativeData(sqLiteDatabase, _nativeData))
+            Log.i("Unity", "Setup the native data");
+
+        // if this fails then we have a problem
+        if((nativeData = NativeDataHandler.getNativeData(sqLiteDatabase)) == null){
+            Log.i("Unity", "We have a problem");
+        }
+    }
+
+    private void miniQuestCompletedNotification(){
+
+        //todo create a proper notification that opens the game (to the correct state?)
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.title_1)
+                        .setContentTitle("MiniQuest Completed")
+                        .setContentText("You have completed the MiniQuest!");
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        mNotificationManager.notify(0, mBuilder.build());
+    }
+
+    // start the timer for the create a new miniQuest
+    private void startMiniQuestTimer(){
+        // create or cancel the timer
+        if(timer != null) {
+            timer.cancel();
+        }else{
+            timer = new Timer();
+        }
+        timer.schedule(new TimeDelyForMiniQuest(), 0, MiniQuestNotificationTimeDelay);
+    }
 
     // Below is required for binding services/activities
-
     public class ServiceBinder extends Binder {
         ServiceHandler getService() {
             // Return this instance of LocalService so clients can call public methods
@@ -148,4 +250,51 @@ public class ServiceHandler extends Service {
             timerServiceRegistered = false;
         }
     };
+
+    // timer class that will notify the player of a new miniquest
+    class TimeDelyForMiniQuest extends TimerTask{
+
+        @Override
+        public void run() {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    // if the local time is between 8am and 8pm then offer a new quest
+                    Calendar calendar = Calendar.getInstance();
+                    int hour = calendar.get(Calendar.HOUR_OF_DAY);
+
+                    // todo implement this boolean in the timer class that is "better" (aka more like what we talked about)
+                    if(hour >= 8 && hour <= 20 && (!nativeData.isAvailableMiniQuest() || nativeData.getMiniquestId() != 0)){
+
+                        // todo uncomment this section when the
+                        /*
+
+                        // sets a miniquest to be available
+                        // doing this will prevent this notification from happening again unless they turn down the miniquest
+                        nativeData.setAvailableMiniQuest(true);
+                        if(NativeDataHandler.updateNativeData(nativeData, sqLiteDatabase)){
+                            nativeData = NativeDataHandler.getNativeData(sqLiteDatabase);
+                        }
+                        */
+
+
+                        //todo create a proper notification that opens the game (to the correct state?)
+                        NotificationCompat.Builder mBuilder =
+                                new NotificationCompat.Builder(getApplicationContext())
+                                        .setSmallIcon(R.drawable.title_1)
+                                        .setContentTitle("A New MiniQuest!")
+                                        .setContentText("A new Quest is available for you to do!");
+
+                        NotificationManager mNotificationManager =
+                                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+                        mNotificationManager.notify(2, mBuilder.build());
+
+                    }
+                }
+            });
+        }
+    }
+
+
 }

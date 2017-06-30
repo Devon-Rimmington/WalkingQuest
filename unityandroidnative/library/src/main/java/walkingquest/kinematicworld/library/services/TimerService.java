@@ -1,6 +1,5 @@
 package walkingquest.kinematicworld.library.services;
 
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -9,8 +8,11 @@ import android.content.ServiceConnection;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import walkingquest.kinematicworld.library.database.DatabaseAccessor;
+import walkingquest.kinematicworld.library.database.databaseHandlers.NativeDataHandler;
+import walkingquest.kinematicworld.library.database.objects.NativeData;
 
 /**
  * Created by Devon on 6/15/2017.
@@ -22,15 +24,20 @@ public class TimerService extends Service {
     private ServiceHandler mServiceHandler;
     private boolean serviceHandlerRegistered;
 
+    private DatabaseAccessor databaseAccessor;
+    private NativeData nativeData;
+
     @Override
     public void onCreate(){
 
-        Log.d("Unity", "Timer Service Created");
+        databaseAccessor = new DatabaseAccessor(this);
+        if((nativeData = NativeDataHandler.getNativeData(databaseAccessor.getReadableDatabase())) == null){
+            Log.i("Unity", "Could not find the native data");
+        }
 
         // bind this service to the service handler to push and pull information from it
         Intent intent = new Intent(this, ServiceHandler.class);
         bindService(intent, serviceHandlerConnection, Context.BIND_AUTO_CREATE);
-
     }
 
     @Override
@@ -45,44 +52,32 @@ public class TimerService extends Service {
 
     // method invokes a push notification to the user when an event or miniquest is available
     // or when a miniquest has been completed and a reward can be collected
-    public void invokeNotification(String msg){
+    public void checkTimer(){
 
         if(serviceHandlerRegistered){
-            /*
+
             // todo remove this hardcoding
-            long stepsRequired = 100;
-            // push a notification about the quest being done
-            if(mServiceHandler.getSteps() >= stepsRequired){
+            long stepsRequired = 25;
 
-                //todo create a proper notification that opens the game (to the correct state?)
-
-                NotificationCompat.Builder mBuilder =
-                        new NotificationCompat.Builder(this)
-                                .setSmallIcon(R.drawable.sun)
-                                .setContentTitle("My notification")
-                                .setContentText("Hello World!");
-
-                NotificationManager mNotificationManager =
-                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-                mNotificationManager.notify(0, mBuilder.build());
+            // push a notification about a new event being available
+            if((mServiceHandler.getTotalSteps() % stepsRequired) == 0) {
+                mServiceHandler.Update("NEWEVENT");
             }
-            */
         }
-
     }
 
-    // a timer used to check if someone is currently active or has just started to become active
-    private void startTimer(){
+    // takes in specific events from the service handler
+    public void Update(String event){
 
-        // if the player has not taken steps for a while push a notification about a new miniquest
-
-        // if the player is walking for a while push a notification about an event
-
-    }
-
-    public void Update(){
-        invokeNotification("MiniQuest Done!");
+        switch (event){
+            case "ACTIVEEVENT":
+                checkTimer();
+                break;
+            case "MINIQUESTTIMER":
+                break;
+            default:
+                break;
+        }
     }
 
     @Nullable
