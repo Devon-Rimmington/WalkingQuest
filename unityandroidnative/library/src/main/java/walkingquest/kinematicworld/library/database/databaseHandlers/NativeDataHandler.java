@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Debug;
 import android.util.Log;
 
+import walkingquest.kinematicworld.library.database.DatabaseAccessor;
 import walkingquest.kinematicworld.library.database.contracts.NativeDataContract;
 import walkingquest.kinematicworld.library.database.objects.NativeData;
 
@@ -53,16 +54,16 @@ public class NativeDataHandler {
             Log.i("Unity", "getting native data result");
 
             nativeData = new NativeData(
-                    cursor.getString(1),
-                    cursor.getLong(2),
-                    cursor.getLong(3),
-                    cursor.getLong(4),
-                    cursor.getLong(5),
-                    cursor.getLong(6),
-                    cursor.getLong(7),
-                    cursor.getLong(8),
-                    cursor.getLong(9),
-                    (1 == cursor.getInt(10))
+                    cursor.getString(1),        // User ID
+                    cursor.getLong(2),          // CharacterID
+                    cursor.getLong(3),          // number of ActiveEvents
+                    cursor.getLong(4),          // MiniQuestID
+                    cursor.getLong(5),          // MiniQuestStepsRequired
+                    cursor.getLong(6),          // MiniQuestStepCompleted
+                    cursor.getLong(7),          // MiniQuestStartTime
+                    cursor.getLong(8),          // TotalUserSteps
+                    cursor.getLong(9),          // TripCounterSteps
+                    (1 == cursor.getInt(10))    // is MiniQuestAvailable
             );
 
             Log.i("Unity", "title " + cursor.getString(1));

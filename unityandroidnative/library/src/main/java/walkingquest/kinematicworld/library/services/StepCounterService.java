@@ -31,7 +31,7 @@ public class StepCounterService extends Service implements SensorEventListener {
     @Override
     public  void onCreate(){
 
-        Log.d("Unity", "Step Service Created");
+        // Log.d("Unity", "Step Service Created");
 
         // bind this service to the handler service
         // this allows this service to push up changes to the handler
@@ -61,7 +61,7 @@ public class StepCounterService extends Service implements SensorEventListener {
         sensor = sensorManager.getDefaultSensor(sensorType);
         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_STATUS_ACCURACY_HIGH);
 
-        Log.d("Unity", "Sensor Registered");
+        // Log.d("Unity", "Sensor Registered");
 
     }
 
@@ -91,7 +91,7 @@ public class StepCounterService extends Service implements SensorEventListener {
             // push information up to the service handler
             if (serviceHandlerRegistered) {
                 mServiceHandler.Update("STEP");
-                Log.d("Unity", "Step Added to Log");
+                // Log.d("Unity", "Step Added to Log");
             }
         }
     }

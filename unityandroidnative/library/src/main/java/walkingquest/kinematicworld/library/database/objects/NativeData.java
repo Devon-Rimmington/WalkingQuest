@@ -17,6 +17,9 @@ public class NativeData {
         userTotalStepCount,
         tripCounterSteps;
 
+    // todo implement this value across the entire database section
+    private long lastMiniQuestCompleted = 0;
+
     private boolean availableMiniQuest;
 
     public NativeData(String userId,
@@ -123,7 +126,17 @@ public class NativeData {
         this.availableMiniQuest = availableMiniQuest;
     }
 
+    public long getLastMiniQuestCompleted() {
+        return lastMiniQuestCompleted;
+    }
+
+    public void setLastMiniQuestCompleted(long lastMiniQuestCompleted) {
+        this.lastMiniQuestCompleted = lastMiniQuestCompleted;
+    }
+
     public String toString(){
-        return this.userId + " " + this.characterId + " " + this.getTripCounterSteps() + " " + this.getUserTotalStepCount();
+        return "UserID: " + this.userId + "\nCharcterID: " + this.characterId + "\nTrip Counter " + this.getTripCounterSteps() + "\nTotal Step Count" + this.getUserTotalStepCount()
+                + "\nMiniQuestID: " + this.miniquestId + "\nMiniQuest Start Time " + this.miniquestStartTime
+                + "\nNumber Of Active Events " + this.availableEventCount + "\nMiniQuest Available " + this.availableMiniQuest;
     }
 }

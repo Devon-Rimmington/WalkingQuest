@@ -112,6 +112,13 @@ public class UnityActivityPlayerHolder {
         return -1;
     }
 
+    public static long getLastMiniQuestCompleted(){
+        if(serviceHandlerRegistered){
+            return mServiceHandler.getLastMiniQuestCompleted();
+        }
+        return -1;
+    }
+
     // reset the trip counter
     public static boolean resetTripSteps(){
         if(serviceHandlerRegistered)

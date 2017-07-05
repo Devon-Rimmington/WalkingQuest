@@ -22,8 +22,15 @@ public class SQLTables {
                         NativeDataContract.COLUMN_MINI_QUEST_START_TIME + " INT8, " +
                         NativeDataContract.COLUMN_TOTAL_USER_STEPS + " INT8, " +
                         NativeDataContract.COLUMN_TRIP_COUNTER_STEPS + " INT8 );";
+                        // todo add a new field which is the ID of the last miniquest completed
 
         public static final String DELETE_TABLE_NATIVE_DATA =
                 "DROP TABLE IF EXISTS " + NativeDataContract.TABLE_NAME;
     }
+
+    // todo create a new table for 'other' data
+    // todo add more as we can
+    /*  such as: user_id, timezone, start play time, end play time (between the start/end
+        play time the player won't receive any miniquests),height, weight gender, age,
+        occupation (sitting, standing, walking) type, country   */
 }

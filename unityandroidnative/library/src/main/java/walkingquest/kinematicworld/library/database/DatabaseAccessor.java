@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import walkingquest.kinematicworld.library.R;
 import walkingquest.kinematicworld.library.database.sql.SQLTables;
 
 /**
@@ -14,8 +15,8 @@ import walkingquest.kinematicworld.library.database.sql.SQLTables;
 
 public class DatabaseAccessor extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 7;
-    public static final String DATABASE_NAME = "walkingquest.db";
+    public static final int DATABASE_VERSION = 9; // Would like to put this value in the resource folder but this class doesn't extend a service/activity
+    public static final String DATABASE_NAME = "WalkingQuest.db"; // same as above
 
     public DatabaseAccessor(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

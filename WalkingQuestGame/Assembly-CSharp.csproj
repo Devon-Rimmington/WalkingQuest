@@ -47,8 +47,10 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\FireBaseController.cs" />
-     <Compile Include="Assets\Scripts\FirebaseLogin.cs" />
+     <Compile Include="Assets\Scripts\MiniQuests\MiniQuestGetter.cs" />
      <Compile Include="Assets\Scripts\NativeController.cs" />
+     <Compile Include="Assets\Scripts\UI\DebugScreen.cs" />
+     <Compile Include="Assets\Scripts\UI\FirebaseLogin.cs" />
      <None Include="Assets\PlayServicesResolver\Editor\play-services-resolver_v1.2.29.0.txt" />
      <None Include="Assets\Firebase\Editor\FirebaseAuth_v4.0.1_manifest.txt" />
      <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-auth-unity\maven-metadata.xml" />

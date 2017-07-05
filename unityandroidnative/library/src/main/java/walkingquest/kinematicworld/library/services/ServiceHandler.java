@@ -1,11 +1,13 @@
 package walkingquest.kinematicworld.library.services;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Binder;
 import android.os.Handler;
@@ -15,6 +17,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -41,26 +44,34 @@ public class ServiceHandler extends Service {
     private DatabaseAccessor databaseAccessor;
     private SQLiteDatabase sqLiteDatabase;
     private NativeData nativeData = null;
-    private long steps;
 
     // variables for the timer
-    private static final long MiniQuestNotificationTimeDelay = 20*60*1000; // 1 minute todo change to 20 minutes
+    private long MiniQuestNotificationTimeDelay;
     private Timer timer;
     private Handler handler = new Handler();
 
+    private String walkingQuestPackageName = "com.KinematicWorld.WalkingQuest";
+
+    private NotificationManager mNotificationManager;
+    private final int MINIQUEST_COMPLETE = 0, MINIQUEST_AVAILABLE = 1, ACTIVEEVENT_AVAILABLE = 2;
 
     @Override
     public void onCreate(){
+
+        // set the timer delay
+        MiniQuestNotificationTimeDelay = 60*60*1000; // once every 60 minutes
 
         // setting up the native data inputs
         databaseAccessor = new DatabaseAccessor(this);
         sqLiteDatabase = databaseAccessor.getWritableDatabase();
 
+        // make sure that the sql database has data in it (will return null if nativeData is empty)
+        // if it's empty than fill it with base data
         if((nativeData = NativeDataHandler.getNativeData(sqLiteDatabase)) == null){
+            // todo check firebase before creating new data
             setupNativeDataEntry();
         }
 
-        steps = 0;
         // start the timer for creating a new miniquest
         startMiniQuestTimer();
 
@@ -91,9 +102,11 @@ public class ServiceHandler extends Service {
 
     public void Update(String msg){
 
+        // todo make sure adding this doesn't f anything up
+        // nativeData = NativeDataHandler.getNativeData(sqLiteDatabase);
+
         switch (msg){
             case "STEP":
-                steps++;
 
                 // increase the trip counter
                 long tripCount = nativeData.getTripCounterSteps();
@@ -106,7 +119,7 @@ public class ServiceHandler extends Service {
                 nativeData.setUserTotalStepCount(stepCount);
 
                 // if a miniquest exists and the miniquest_id has been set (aka a quest has been accepted)
-                if(nativeData.isAvailableMiniQuest() && nativeData.getMiniquestId() != 0){
+                if(nativeData.isAvailableMiniQuest() && nativeData.getMiniquestId() != -1){
                     long questStepCount = nativeData.getMiniquestStepCompleted();
                     questStepCount++;
                     nativeData.setMiniquestStepCompleted(questStepCount);
@@ -116,7 +129,7 @@ public class ServiceHandler extends Service {
 
                         // if the miniquest is completed change the nativeData
                         nativeData.setAvailableMiniQuest(false);
-                        nativeData.setMiniquestId(0);
+                        nativeData.setMiniquestId(-1);
 
                         // notify the user
                         miniQuestCompletedNotification();
@@ -124,8 +137,6 @@ public class ServiceHandler extends Service {
                 }
 
                 mTimerService.Update("ACTIVEEVENT");
-
-                Log.d("Unity", "The steps from the NativeData is " + nativeData.getUserTotalStepCount());
                 break;
 
             case "NEWEVENT":
@@ -135,17 +146,34 @@ public class ServiceHandler extends Service {
                 numberOfEvents++;
                 nativeData.setAvailableEventCount(numberOfEvents);
 
+                // initialize the boot walkingquest when the player clicks on the game
+                PackageManager manager = getApplicationContext().getPackageManager();
+
+                Intent walkingQuestIntent = manager.getLaunchIntentForPackage(walkingQuestPackageName);
+                PendingIntent walkingQuestStartIntent = PendingIntent.getActivity(
+                        getApplicationContext(), 0, walkingQuestIntent, PendingIntent.FLAG_UPDATE_CURRENT
+                );
+
+                Intent declineActiveEventIntent = new Intent(getApplicationContext(), DeclineActiveEvent.class);
+                PendingIntent declineActiveEventStartIntent = PendingIntent.getService(
+                        getApplicationContext(), 1, declineActiveEventIntent, PendingIntent.FLAG_ONE_SHOT
+                );
+
                 //todo create a proper notification that opens the game (to the correct state?)
                 NotificationCompat.Builder mBuilder =
                         new NotificationCompat.Builder(this)
                                 .setSmallIcon(R.drawable.title_1)
                                 .setContentTitle("A New Event")
-                                .setContentText("A new event is available for you to play");
+                                .setContentText("A new event is available for you to play")
+                                .setAutoCancel(true);
 
-                NotificationManager mNotificationManager =
+                mBuilder.setContentIntent(walkingQuestStartIntent);
+                mBuilder.addAction(R.drawable.decline, "Decline", declineActiveEventStartIntent);
+
+                mNotificationManager =
                         (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-                mNotificationManager.notify(1, mBuilder.build());
+                mNotificationManager.notify(ACTIVEEVENT_AVAILABLE, mBuilder.build());
                 break;
         default:
                 break;
@@ -153,6 +181,7 @@ public class ServiceHandler extends Service {
 
         if(NativeDataHandler.updateNativeData(nativeData, sqLiteDatabase)) {
             nativeData = NativeDataHandler.getNativeData(sqLiteDatabase);
+            Log.i("Unity", nativeData.toString());
         }
     }
 
@@ -266,6 +295,13 @@ public class ServiceHandler extends Service {
         return -1;
     }
 
+    public long getLastMiniQuestCompleted(){
+        if(isNativeDataAvailable()){
+            return nativeData.getLastMiniQuestCompleted();
+        }
+        return -1;
+    }
+
     public boolean resetTripSteps(){
         if(isNativeDataAvailable()){
             nativeData.setTripCounterSteps(0);
@@ -291,13 +327,13 @@ public class ServiceHandler extends Service {
     // if the database has no entry yet then set an initial entry
     private void setupNativeDataEntry(){
 
-        NativeData _nativeData = new NativeData("test", 0, 0, 0, 0, 0, 0, 0, 0, false);
+        NativeData _nativeData = new NativeData("test", -1, -1, -1, -1, -1, -1, -1, -1, false);
         if(NativeDataHandler.insertNativeData(sqLiteDatabase, _nativeData))
-            Log.i("Unity", "Setup the native data");
+            // Log.i("Unity", "Setup the native data");
 
         // if this fails then we have a problem
         if((nativeData = NativeDataHandler.getNativeData(sqLiteDatabase)) == null){
-            Log.i("Unity", "We have a problem");
+            // Log.i("Unity", "We have a problem");
         }
     }
 
@@ -307,16 +343,26 @@ public class ServiceHandler extends Service {
 
         //todo create a proper notification that opens the game (to the correct state?)
 
+        // initialize the boot walkingquest when the player clicks on the game
+        PackageManager manager = getApplicationContext().getPackageManager();
+        Intent walkingQuestIntent = manager.getLaunchIntentForPackage(walkingQuestPackageName);
+        PendingIntent walkingQuestStartIntent = PendingIntent.getActivity(
+                getApplicationContext(), 0, walkingQuestIntent, PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.title_1)
                         .setContentTitle("MiniQuest Completed")
-                        .setContentText("You have completed the MiniQuest!");
+                        .setContentText("You have completed the MiniQuest!")
+                        .setAutoCancel(true);
 
-        NotificationManager mNotificationManager =
+        mBuilder.setContentIntent(walkingQuestStartIntent);
+
+        mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        mNotificationManager.notify(0, mBuilder.build());
+        mNotificationManager.notify(MINIQUEST_COMPLETE, mBuilder.build());
     }
 
     // start the timer for the create a new miniQuest
@@ -382,41 +428,78 @@ public class ServiceHandler extends Service {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    // if the local time is between 8am and 8pm then offer a new quest
-                    Calendar calendar = Calendar.getInstance();
-                    int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                // if the local time is between 8am and 8pm then offer a new quest
+                Calendar calendar = Calendar.getInstance();
+                // todo add user input for picking a timezone
+                // calendar.setTimeZone(TimeZone.getTimeZone("AST"));
+                int hour = calendar.get(Calendar.HOUR_OF_DAY);
 
-                    // todo implement this boolean in the timer class that is "better" (aka more like what we talked about)
-                    if(hour >= 8 && hour <= 20 && (!nativeData.isAvailableMiniQuest() || nativeData.getMiniquestId() != 0)){
+                // todo implement this boolean in the timer class that is "better" (aka more like what we talked about)
+                if(hour >= 8 && hour <= 20 && (!nativeData.isAvailableMiniQuest() || nativeData.getMiniquestId() != 0)){
 
-                        // todo uncomment this section when the
-                        /*
+                    // if a miniquest is already available then don't add a new notification
+                    if(!nativeData.isAvailableMiniQuest()) {
 
                         // sets a miniquest to be available
-                        // doing this will prevent this notification from happening again unless they turn down the miniquest
+                        // todo doing this will prevent this notification from happening again unless they turn down the miniquest
                         nativeData.setAvailableMiniQuest(true);
                         if(NativeDataHandler.updateNativeData(nativeData, sqLiteDatabase)){
                             nativeData = NativeDataHandler.getNativeData(sqLiteDatabase);
                         }
-                        */
 
+                        // initialize the boot walkingquest when the player clicks on the game
+                        PackageManager manager = getApplicationContext().getPackageManager();
+                        Intent walkingQuestIntent = manager.getLaunchIntentForPackage(walkingQuestPackageName);
+                        PendingIntent walkingQuestStartIntent = PendingIntent.getActivity(
+                                getApplicationContext(), 0, walkingQuestIntent, PendingIntent.FLAG_UPDATE_CURRENT
+                        );
+
+                        Intent declineMiniQuestIntent = new Intent(getApplicationContext(), DeclineMiniQuest.class);
+                        PendingIntent declineMiniQuestStartIntent = PendingIntent.getService(
+                                getApplicationContext(), 1, declineMiniQuestIntent, PendingIntent.FLAG_ONE_SHOT
+                        );
 
                         //todo create a proper notification that opens the game (to the correct state?)
                         NotificationCompat.Builder mBuilder =
                                 new NotificationCompat.Builder(getApplicationContext())
                                         .setSmallIcon(R.drawable.title_1)
                                         .setContentTitle("A New MiniQuest!")
-                                        .setContentText("A new Quest is available for you to do!");
+                                        .setContentText("A new Quest is available for you to do!")
+                                        .setAutoCancel(true);
 
-                        NotificationManager mNotificationManager =
+                        // set the boot element into the notification
+                        mBuilder.setContentIntent(walkingQuestStartIntent);
+                        mBuilder.addAction(R.drawable.decline, "Decline", declineMiniQuestStartIntent);
+
+                        mNotificationManager =
                                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-                        mNotificationManager.notify(2, mBuilder.build());
-
+                        mNotificationManager.notify(MINIQUEST_AVAILABLE, mBuilder.build());
                     }
+                }
                 }
             });
         }
+    }
+
+    // decline accepting the miniquest from a notification
+    public void declineMiniQuest(){
+        nativeData.setAvailableMiniQuest(false);
+        NativeDataHandler.updateNativeData(nativeData, sqLiteDatabase);
+        Log.i("Unity", "Declined MiniQuest");
+        mNotificationManager.cancel(MINIQUEST_AVAILABLE);
+    }
+
+    // decline accepting an active event from a notification
+    public void declineActiveEvent(){
+        long activeEventCount = nativeData.getAvailableEventCount();
+        activeEventCount--;
+        nativeData.setAvailableEventCount(activeEventCount);
+        NativeDataHandler.updateNativeData(nativeData, sqLiteDatabase);
+        nativeData = NativeDataHandler.getNativeData(sqLiteDatabase);
+        Log.i("Unity", "After declining the event" + nativeData.toString());
+        Log.i("Unity", "Declined ActiveEvent");
+        mNotificationManager.cancel(ACTIVEEVENT_AVAILABLE);
     }
 
 

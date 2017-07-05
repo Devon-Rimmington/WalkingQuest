@@ -35,4 +35,32 @@ public class NativeController : MonoBehaviour {
 	void OnDestroy(){
 		nativeAccessor.CallStatic ("Unbind");
 	}
+
+	// Getting the total and trip step count
+
+	public long getTotalSteps(){
+		return nativeAccessor.CallStatic<long> ("getTotalSteps");
+	}
+
+	public long getTripSteps(){
+		return nativeAccessor.CallStatic<long> ("getTripSteps");
+	}
+
+	// get the last completed miniquest
+	public long getLastMiniQuestCompleted(){
+		return nativeAccessor.CallStatic<long> ("getLastMiniQuestCompleted");
+	}
+
+	// set the players current miniquest
+	public bool setCurrentMiniQuest(long miniquestID, long stepsCompleted, long StepsRequired){
+		nativeAccessor.CallStatic<bool> ("setMiniQuest", new object[] {
+			miniquestID, stepsCompleted, StepsRequired
+		});
+		return true;
+	}
+
+	// reseting the trip step count
+	public void resetTripSteps(){
+		nativeAccessor.CallStatic<bool> ("resetTripSteps");
+	}
 }

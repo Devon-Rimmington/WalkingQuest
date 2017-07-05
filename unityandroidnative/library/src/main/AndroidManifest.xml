@@ -11,6 +11,8 @@
         <service android:name=".services.ServiceHandler" android:enabled="true"/>
         <service android:name=".services.TimerService" android:enabled="true"/>
         <service android:name=".services.StepCounterService" android:enabled="true"/>
+        <service android:name=".services.DeclineActiveEvent" android:enabled="true"/>
+        <service android:name=".services.DeclineMiniQuest" android:enabled="true"/>
 
         <receiver android:name="walkingquest.kinematicworld.library.broadcast.BootReceiver"  android:exported="true">
             <intent-filter>
