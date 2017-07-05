@@ -57,7 +57,7 @@ public class TimerService extends Service {
         if(serviceHandlerRegistered){
 
             // todo remove this hardcoding
-            long stepsRequired = 25;
+            long stepsRequired = 250;
 
             // push a notification about a new event being available
             if((mServiceHandler.getTotalSteps() % stepsRequired) == 0) {

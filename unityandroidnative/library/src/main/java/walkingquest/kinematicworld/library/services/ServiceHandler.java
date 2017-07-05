@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -166,6 +167,10 @@ public class ServiceHandler extends Service {
                                 .setContentTitle("A New Event")
                                 .setContentText("A new event is available for you to play")
                                 .setAutoCancel(true);
+
+                // set indicator color and vibrate
+                mBuilder.setVibrate(new long[]{1000, 500, 250, 100});
+                mBuilder.setLights(Color.BLUE, 1000, 3000);
 
                 mBuilder.setContentIntent(walkingQuestStartIntent);
                 mBuilder.addAction(R.drawable.decline, "Decline", declineActiveEventStartIntent);
@@ -357,6 +362,10 @@ public class ServiceHandler extends Service {
                         .setContentText("You have completed the MiniQuest!")
                         .setAutoCancel(true);
 
+        // set indicator color and vibrate
+        mBuilder.setVibrate(new long[]{1000, 500, 250, 100});
+        mBuilder.setLights(Color.BLUE, 1000, 3000);
+
         mBuilder.setContentIntent(walkingQuestStartIntent);
 
         mNotificationManager =
@@ -466,6 +475,10 @@ public class ServiceHandler extends Service {
                                         .setContentTitle("A New MiniQuest!")
                                         .setContentText("A new Quest is available for you to do!")
                                         .setAutoCancel(true);
+
+                        // set indicator color and vibrate
+                        mBuilder.setVibrate(new long[]{1000, 500, 250, 100});
+                        mBuilder.setLights(Color.BLUE, 1000, 3000);
 
                         // set the boot element into the notification
                         mBuilder.setContentIntent(walkingQuestStartIntent);
