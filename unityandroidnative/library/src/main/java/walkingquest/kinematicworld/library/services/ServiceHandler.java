@@ -147,38 +147,7 @@ public class ServiceHandler extends Service {
                 numberOfEvents++;
                 nativeData.setAvailableEventCount(numberOfEvents);
 
-                // initialize the boot walkingquest when the player clicks on the game
-                PackageManager manager = getApplicationContext().getPackageManager();
-
-                Intent walkingQuestIntent = manager.getLaunchIntentForPackage(walkingQuestPackageName);
-                PendingIntent walkingQuestStartIntent = PendingIntent.getActivity(
-                        getApplicationContext(), 0, walkingQuestIntent, PendingIntent.FLAG_UPDATE_CURRENT
-                );
-
-                Intent declineActiveEventIntent = new Intent(getApplicationContext(), DeclineActiveEvent.class);
-                PendingIntent declineActiveEventStartIntent = PendingIntent.getService(
-                        getApplicationContext(), 1, declineActiveEventIntent, PendingIntent.FLAG_ONE_SHOT
-                );
-
-                //todo create a proper notification that opens the game (to the correct state?)
-                NotificationCompat.Builder mBuilder =
-                        new NotificationCompat.Builder(this)
-                                .setSmallIcon(R.drawable.title_1)
-                                .setContentTitle("A New Event")
-                                .setContentText("A new event is available for you to play")
-                                .setAutoCancel(true);
-
-                // set indicator color and vibrate
-                mBuilder.setVibrate(new long[]{1000, 500, 250, 100});
-                mBuilder.setLights(Color.BLUE, 1000, 3000);
-
-                mBuilder.setContentIntent(walkingQuestStartIntent);
-                mBuilder.addAction(R.drawable.decline, "Decline", declineActiveEventStartIntent);
-
-                mNotificationManager =
-                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-                mNotificationManager.notify(ACTIVEEVENT_AVAILABLE, mBuilder.build());
+                notificationBuilder(ACTIVEEVENT_AVAILABLE, "Event", "You have encountered an event!");
                 break;
         default:
                 break;
@@ -347,31 +316,7 @@ public class ServiceHandler extends Service {
     private void miniQuestCompletedNotification(){
 
         //todo create a proper notification that opens the game (to the correct state?)
-
-        // initialize the boot walkingquest when the player clicks on the game
-        PackageManager manager = getApplicationContext().getPackageManager();
-        Intent walkingQuestIntent = manager.getLaunchIntentForPackage(walkingQuestPackageName);
-        PendingIntent walkingQuestStartIntent = PendingIntent.getActivity(
-                getApplicationContext(), 0, walkingQuestIntent, PendingIntent.FLAG_UPDATE_CURRENT
-        );
-
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.title_1)
-                        .setContentTitle("MiniQuest Completed")
-                        .setContentText("You have completed the MiniQuest!")
-                        .setAutoCancel(true);
-
-        // set indicator color and vibrate
-        mBuilder.setVibrate(new long[]{1000, 500, 250, 100});
-        mBuilder.setLights(Color.BLUE, 1000, 3000);
-
-        mBuilder.setContentIntent(walkingQuestStartIntent);
-
-        mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        mNotificationManager.notify(MINIQUEST_COMPLETE, mBuilder.build());
+        notificationBuilder(MINIQUEST_COMPLETE, "Quest Completed", "Congratulations, Click to Accept Rewards");
     }
 
     // start the timer for the create a new miniQuest
@@ -456,43 +401,91 @@ public class ServiceHandler extends Service {
                             nativeData = NativeDataHandler.getNativeData(sqLiteDatabase);
                         }
 
-                        // initialize the boot walkingquest when the player clicks on the game
-                        PackageManager manager = getApplicationContext().getPackageManager();
-                        Intent walkingQuestIntent = manager.getLaunchIntentForPackage(walkingQuestPackageName);
-                        PendingIntent walkingQuestStartIntent = PendingIntent.getActivity(
-                                getApplicationContext(), 0, walkingQuestIntent, PendingIntent.FLAG_UPDATE_CURRENT
-                        );
-
-                        Intent declineMiniQuestIntent = new Intent(getApplicationContext(), DeclineMiniQuest.class);
-                        PendingIntent declineMiniQuestStartIntent = PendingIntent.getService(
-                                getApplicationContext(), 1, declineMiniQuestIntent, PendingIntent.FLAG_ONE_SHOT
-                        );
-
-                        //todo create a proper notification that opens the game (to the correct state?)
-                        NotificationCompat.Builder mBuilder =
-                                new NotificationCompat.Builder(getApplicationContext())
-                                        .setSmallIcon(R.drawable.title_1)
-                                        .setContentTitle("A New MiniQuest!")
-                                        .setContentText("A new Quest is available for you to do!")
-                                        .setAutoCancel(true);
-
-                        // set indicator color and vibrate
-                        mBuilder.setVibrate(new long[]{1000, 500, 250, 100});
-                        mBuilder.setLights(Color.BLUE, 1000, 3000);
-
-                        // set the boot element into the notification
-                        mBuilder.setContentIntent(walkingQuestStartIntent);
-                        mBuilder.addAction(R.drawable.decline, "Decline", declineMiniQuestStartIntent);
-
-                        mNotificationManager =
-                                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-                        mNotificationManager.notify(MINIQUEST_AVAILABLE, mBuilder.build());
+                        notificationBuilder(MINIQUEST_AVAILABLE, "Quest Available", "Click to Accept");
                     }
                 }
                 }
             });
         }
+    }
+
+
+    public void notificationBuilder(int notificationType, String title, String text){
+
+
+        PackageManager manager = getApplicationContext().getPackageManager();
+
+        Intent walkingQuestIntent = manager.getLaunchIntentForPackage(walkingQuestPackageName);
+        PendingIntent walkingQuestStartIntent = PendingIntent.getActivity(
+                getApplicationContext(), 0, walkingQuestIntent, PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(getApplicationContext())
+                        .setSmallIcon(R.drawable.title_1)
+                        .setContentTitle(title)
+                        .setContentText(text)
+                        .setAutoCancel(true);
+
+        // set indicator color and vibrate
+        mBuilder.setVibrate(new long[]{1000, 500, 250, 100});
+        mBuilder.setLights(Color.BLUE, 1000, 3000);
+
+        mBuilder.setContentIntent(walkingQuestStartIntent);
+
+        mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        switch (notificationType){
+
+            case ACTIVEEVENT_AVAILABLE:
+
+                // all the player to decline an active event
+                // this might not be a good thing to implement
+                /*
+                Intent declineActiveEventIntent = new Intent(getApplicationContext(), DeclineActiveEvent.class);
+                PendingIntent declineActiveEventStartIntent = PendingIntent.getService(
+                        getApplicationContext(), 1, declineActiveEventIntent, PendingIntent.FLAG_ONE_SHOT
+                );
+                mBuilder.addAction(R.drawable.decline, "Decline", declineActiveEventStartIntent);
+                */
+                mNotificationManager.notify(ACTIVEEVENT_AVAILABLE, mBuilder.build());
+
+                break;
+
+            case MINIQUEST_AVAILABLE:
+
+                // give the player the ablility to decline a miniquest
+                Intent declineMiniQuestIntent = new Intent(getApplicationContext(), DeclineMiniQuest.class);
+                PendingIntent declineMiniQuestStartIntent = PendingIntent.getService(
+                        getApplicationContext(), 1, declineMiniQuestIntent, PendingIntent.FLAG_ONE_SHOT
+                );
+
+                // set the boot element into the notification
+                mBuilder.setContentIntent(walkingQuestStartIntent);
+                mBuilder.addAction(R.drawable.decline, "Decline", declineMiniQuestStartIntent);
+
+                mNotificationManager.notify(MINIQUEST_AVAILABLE, mBuilder.build());
+                break;
+
+            case MINIQUEST_COMPLETE:
+
+                // initialize the boot walkingquest when the player clicks on the game
+                mNotificationManager.notify(MINIQUEST_COMPLETE, mBuilder.build());
+                break;
+
+            default:
+                mBuilder = new NotificationCompat.Builder(getApplicationContext())
+                        .setSmallIcon(R.drawable.title_1)
+                        .setContentTitle("failed")
+                        .setContentText("default")
+                        .setAutoCancel(true);
+
+                mNotificationManager.notify(99, mBuilder.build());
+                break;
+        }
+
+
     }
 
     // decline accepting the miniquest from a notification
