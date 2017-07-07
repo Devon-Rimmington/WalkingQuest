@@ -57,6 +57,13 @@ public class UnityActivityPlayerHolder {
         return false;
     }
 
+    // get the current miniquest id
+    public static long getMiniQuestId(){
+        if(serviceHandlerRegistered)
+            return mServiceHandler.getMiniQuestId();
+        return -1;
+    }
+
     // get the steps completed towards a miniquest
     public static long getStepsCompleted(){
         if(serviceHandlerRegistered)
@@ -92,7 +99,7 @@ public class UnityActivityPlayerHolder {
     }
 
     // gets whether or not a miniquest is available for the player to play
-    public static boolean getQuestAvailable(){
+    public static boolean getMiniQuestAvailable(){
         if(serviceHandlerRegistered)
             return mServiceHandler.getMiniQuestAvailable();
         return false;

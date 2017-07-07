@@ -27,6 +27,9 @@ public class TimerService extends Service {
     private DatabaseAccessor databaseAccessor;
     private NativeData nativeData;
 
+    // the number of steps required for creating a new active event
+    private final long STEPS_REQUIRED = 3500;
+
     @Override
     public void onCreate(){
 
@@ -57,7 +60,7 @@ public class TimerService extends Service {
         if(serviceHandlerRegistered){
 
             // todo remove this hardcoding
-            long stepsRequired = 250;
+            long stepsRequired = STEPS_REQUIRED;
 
             // push a notification about a new event being available
             if((mServiceHandler.getTotalSteps() % stepsRequired) == 0) {

@@ -36,8 +36,7 @@ public class NativeController : MonoBehaviour {
 		nativeAccessor.CallStatic ("Unbind");
 	}
 
-	// Getting the total and trip step count
-
+	/*####Getting the total and trip step count#####*/
 	public long getTotalSteps(){
 		return nativeAccessor.CallStatic<long> ("getTotalSteps");
 	}
@@ -45,7 +44,34 @@ public class NativeController : MonoBehaviour {
 	public long getTripSteps(){
 		return nativeAccessor.CallStatic<long> ("getTripSteps");
 	}
+	/*###############################################*/
 
+	// get if a miniquest is available
+	public bool isMiniQuestAvailable(){
+		return nativeAccessor.CallStatic<bool> ("getMiniQuestAvailable");
+	}
+
+	// get the current miniquestId
+	public long getMiniQuestId(){
+		if (isMiniQuestAvailable())
+			return nativeAccessor.CallStatic<long> ("getMiniQuestId");
+		return -1;
+	}
+
+	// get the number of steps completed towards the current miniquest
+	public long getCompletedSteps(){
+		if (isMiniQuestAvailable())
+			return nativeAccessor.CallStatic<long> ("getStepsCompleted");
+		return -1;
+	}
+
+	// get the number of steps that is required to complete the miniquest
+	public long getRequiredSteps(){
+		if (isMiniQuestAvailable())
+			return nativeAccessor.CallStatic<long> ("getStepsRequired");
+		return -1;
+	}
+		
 	// get the last completed miniquest
 	public long getLastMiniQuestCompleted(){
 		return nativeAccessor.CallStatic<long> ("getLastMiniQuestCompleted");

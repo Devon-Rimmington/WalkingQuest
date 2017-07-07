@@ -190,6 +190,14 @@ public class ServiceHandler extends Service {
         return false;
     }
 
+    // get the id of the current miniquest
+    public long getMiniQuestId(){
+        if(isNativeDataAvailable()){
+            return nativeData.getMiniquestId();
+        }
+        return -1;
+    }
+
     // get the number of steps that have been put towards completing a miniquest
     public long getStepsCompleted(){
         if(isNativeDataAvailable()){
@@ -301,7 +309,7 @@ public class ServiceHandler extends Service {
     // if the database has no entry yet then set an initial entry
     private void setupNativeDataEntry(){
 
-        NativeData _nativeData = new NativeData("test", -1, -1, -1, -1, -1, -1, -1, -1, false);
+        NativeData _nativeData = new NativeData("Player1", 0, 0, 1, 0, 0, 0, 0, 0, true);
         if(NativeDataHandler.insertNativeData(sqLiteDatabase, _nativeData))
             // Log.i("Unity", "Setup the native data");
 

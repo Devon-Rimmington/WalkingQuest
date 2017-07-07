@@ -15,7 +15,7 @@ import walkingquest.kinematicworld.library.database.sql.SQLTables;
 
 public class DatabaseAccessor extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 9; // Would like to put this value in the resource folder but this class doesn't extend a service/activity
+    public static final int DATABASE_VERSION = 10; // Would like to put this value in the resource folder but this class doesn't extend a service/activity
     public static final String DATABASE_NAME = "WalkingQuest.db"; // same as above
 
     public DatabaseAccessor(Context context) {
