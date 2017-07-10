@@ -35,7 +35,7 @@ public class TimerService extends Service {
 
         databaseAccessor = new DatabaseAccessor(this);
         if((nativeData = NativeDataHandler.getNativeData(databaseAccessor.getReadableDatabase())) == null){
-            Log.i("Unity", "Could not find the native data");
+            Log.d("Unity", "Could not find the native data");
         }
 
         // bind this service to the service handler to push and pull information from it

@@ -32,7 +32,7 @@ public class DeclineActiveEvent extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
-        Log.i("Unity", "Declined Started");
+        Log.d("Unity", "Declined Started");
         return START_NOT_STICKY;
     }
 

@@ -18,7 +18,7 @@ public class BootReceiver extends BroadcastReceiver {
 
         switch (intent.getAction()){
             case Intent.ACTION_BOOT_COMPLETED: // when the device gets started restart the services
-                Log.i("Unity", "Broadcast Received");
+                Log.d("Unity", "Broadcast Received");
                 context.startService(new Intent(context, ServiceHandler.class));
                 break;
             default:

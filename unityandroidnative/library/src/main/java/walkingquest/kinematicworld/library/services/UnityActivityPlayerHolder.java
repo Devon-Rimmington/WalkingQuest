@@ -22,7 +22,7 @@ public class UnityActivityPlayerHolder {
     {
         unityActivity = activity;
 
-        Log.i("Unity", "Trying to start service");
+        Log.d("Unity", "Trying to start service");
         Intent intent = new Intent(activity, ServiceHandler.class);
         activity.startService(intent);
         activity.bindService(intent, serviceHandlerConnection, Context.BIND_AUTO_CREATE);

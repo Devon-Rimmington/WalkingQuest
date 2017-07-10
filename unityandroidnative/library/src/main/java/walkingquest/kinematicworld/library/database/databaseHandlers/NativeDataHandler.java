@@ -46,12 +46,12 @@ public class NativeDataHandler {
 
         cursor.moveToFirst();
         while(cursor.moveToNext()){
-            Log.i("Unity", "Entry");
+            Log.d("Unity", "Entry");
         }
 
         if(cursor.moveToFirst()) {
 
-            Log.i("Unity", "getting native data result");
+            Log.d("Unity", "getting native data result");
 
             nativeData = new NativeData(
                     cursor.getString(1),        // User ID
@@ -66,7 +66,7 @@ public class NativeDataHandler {
                     (1 == cursor.getInt(10))    // is MiniQuestAvailable
             );
 
-            Log.i("Unity", "title " + cursor.getString(1));
+            Log.d("Unity", "title " + cursor.getString(1));
         }
         cursor.close();
 
@@ -98,7 +98,7 @@ public class NativeDataHandler {
     public static boolean updateNativeData(NativeData nativeData, SQLiteDatabase db){
 
 
-        Log.i("Unity", nativeData.getTripCounterSteps() + " " + nativeData.getUserTotalStepCount());
+        Log.d("Unity", nativeData.getTripCounterSteps() + " " + nativeData.getUserTotalStepCount());
 
         String selection = NativeDataContract.COLUMN_USER_ID + " = ?";
         String[] selectionArgs = {nativeData.getUserId()};

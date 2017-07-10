@@ -158,7 +158,7 @@ public class ServiceHandler extends Service {
 
         if(NativeDataHandler.updateNativeData(nativeData, sqLiteDatabase)) {
             nativeData = NativeDataHandler.getNativeData(sqLiteDatabase);
-            Log.i("Unity", nativeData.toString());
+            Log.d("Unity", "debug " + nativeData.toString());
         }
     }
 
@@ -313,11 +313,11 @@ public class ServiceHandler extends Service {
 
         NativeData _nativeData = new NativeData("Player1", -1, -1, -1, -1, -1, -1, -1, -1, false);
         if(NativeDataHandler.insertNativeData(sqLiteDatabase, _nativeData))
-            // Log.i("Unity", "Setup the native data");
+            // Log.d("Unity", "Setup the native data");
 
         // if this fails then we have a problem
         if((nativeData = NativeDataHandler.getNativeData(sqLiteDatabase)) == null){
-            // Log.i("Unity", "We have a problem");
+            // Log.d("Unity", "We have a problem");
         }
     }
 
@@ -502,7 +502,7 @@ public class ServiceHandler extends Service {
     public void declineMiniQuest(){
         nativeData.setAvailableMiniQuest(false);
         NativeDataHandler.updateNativeData(nativeData, sqLiteDatabase);
-        Log.i("Unity", "Declined MiniQuest");
+        Log.d("Unity", "Declined MiniQuest");
         mNotificationManager.cancel(MINIQUEST_AVAILABLE);
     }
 
@@ -513,8 +513,8 @@ public class ServiceHandler extends Service {
         nativeData.setAvailableEventCount(activeEventCount);
         NativeDataHandler.updateNativeData(nativeData, sqLiteDatabase);
         nativeData = NativeDataHandler.getNativeData(sqLiteDatabase);
-        Log.i("Unity", "After declining the event" + nativeData.toString());
-        Log.i("Unity", "Declined ActiveEvent");
+        Log.d("Unity", "After declining the event" + nativeData.toString());
+        Log.d("Unity", "Declined ActiveEvent");
         mNotificationManager.cancel(ACTIVEEVENT_AVAILABLE);
     }
 

@@ -12,7 +12,7 @@ public class DebugClass {
     public static void PrintToDebug()
     {
 
-        Log.i("Unity", "Hi, Sth is done in Android");
+        Log.d("Unity", "Hi, Sth is done in Android");
 
     }
 
