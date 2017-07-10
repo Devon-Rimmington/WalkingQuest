@@ -11,7 +11,9 @@ public class NativeController : MonoBehaviour {
 	void Start () {
 		// This is the test for starting an android service from a unity game
 
-		Debug.Log ("Starting service");
+		DontDestroyOnLoad (gameObject);
+
+		// Debug.Log ("Starting service");
 
 		AndroidJavaClass unityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
 		AndroidJavaObject unityActivity = unityClass.GetStatic<AndroidJavaObject>("currentActivity");
@@ -83,6 +85,11 @@ public class NativeController : MonoBehaviour {
 			miniquestID, stepsCompleted, StepsRequired
 		});
 		return true;
+	}
+
+	// get the number of activeEvents that a player can do
+	public long getNumberOfActiveEvents(){
+		return nativeAccessor.CallStatic<long> ("getNumberOfEvents");
 	}
 
 	// reseting the trip step count

@@ -130,7 +130,10 @@ public class ServiceHandler extends Service {
 
                         // if the miniquest is completed change the nativeData
                         nativeData.setAvailableMiniQuest(false);
+                        nativeData.setLastMiniQuestCompleted(nativeData.getMiniquestId());
                         nativeData.setMiniquestId(-1);
+                        nativeData.setMiniquestStepCompleted(-1);
+                        nativeData.setMiniquestStepRequired(-1);
 
                         // notify the user
                         miniQuestCompletedNotification();
@@ -233,7 +236,6 @@ public class ServiceHandler extends Service {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -309,7 +311,7 @@ public class ServiceHandler extends Service {
     // if the database has no entry yet then set an initial entry
     private void setupNativeDataEntry(){
 
-        NativeData _nativeData = new NativeData("Player1", 0, 0, 1, 0, 0, 0, 0, 0, true);
+        NativeData _nativeData = new NativeData("Player1", -1, -1, -1, -1, -1, -1, -1, -1, false);
         if(NativeDataHandler.insertNativeData(sqLiteDatabase, _nativeData))
             // Log.i("Unity", "Setup the native data");
 
